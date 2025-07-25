@@ -1,0 +1,18 @@
+/node_modules
+/public/hot
+# /public/storage
+/public/data-template-background
+/public/data-signature
+/storage/*.key
+/vendor
+.env
+.env.backup
+.phpunit.result.cache
+docker-compose.override.yml
+Homestead.json
+Homestead.yaml
+npm-debug.log
+yarn-error.log
+/.idea
+/.vscode
+tekno_peminjaman_teguh_rev.sql

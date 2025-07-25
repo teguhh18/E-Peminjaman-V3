@@ -1,0 +1,7 @@
+Pakai Unsignedbiginterger
+tabel barang = ruang_id(nullable)
+tabel ruang = gedung_id(nullable), pj_id/user_id
+tabel detailpeminjaman_barang = tidak perlu status
+tabel_persetujan =  tidak ada approval role
+
+ACC Kaprodi Opsional
