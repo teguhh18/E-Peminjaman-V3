@@ -6,216 +6,139 @@
 @endphp
 
 @extends($layout)
-    {{-- @extends('layouts.tabler-front.master') --}}
+
 @section('content')
-    <div class="row justify-content-center">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">Update Profile</div>
+<div class="page-header">
+    <div class="container">
+        <h1 class="page-title">Perbarui Profil Anda</h1>
+    </div>
+</div>
 
-                <div class="card-body">
-                    @if ($errors->any())
-                        <div class="alert alert-danger">
-                            <strong>Whoops! Ada beberapa masalah dengan input Anda:</strong>
-                            <ul>
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    @endif
-                    @if (session('msg'))
-                        <div class="alert alert-success">
-                            {{ session('msg') }}
-                        </div>
-                    @endif
-                    <form class="form-horizontal" method="POST" action="{{ route('profil_update', encrypt($user->id)) }}"
-                        enctype="multipart/form-data">
-                        @method('put')
-                        @csrf
-                        <div class="form-group row mb-2">
-                            <label class="col-md-2 control-label">Nama</label>
-                            <div class="col-md-6">
-                                <input type="text"
-                                    class="form-control form-control-sm @error('name') is-invalid @enderror" name="name"
-                                    placeholder="Nama" value="{{ old('name', $user->name) }}" readonly>
-                                @error('name')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
+<div class="page-body">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <form class="card" action="{{ route('profil_update', encrypt($user->id)) }}" method="POST" enctype="multipart/form-data">
+                    @method('put')
+                    @csrf
+                    <div class="card-body">
+                        @if (session('msg'))
+                            <div class="alert alert-success" role="alert">
+                                {{ session('msg') }}
                             </div>
-                        </div>
-
-                        <div class="form-group row mb-2">
-                            <label class="col-md-2 control-label">Username</label>
-                            <div class="col-md-6">
-                                <input type="text"
-                                    class="form-control form-control-sm @error('username') is-invalid @enderror"
-                                    name="username" value="{{ old('username', $user->username) }}" readonly>
-                                @error('username')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-2">
-                            <label class="col-md-2 control-label">Email</label>
-                            <div class="col-md-6">
-                                <input type="email"
-                                    class="form-control form-control-sm @error('email') is-invalid @enderror" name="email"
-                                    value="{{ old('email', $user->email) }}">
-                                @error('email')
-                                    <span class="invalid-feedback" role="alert">
-                                        <strong>{{ $message }}</strong>
-                                    </span>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row mb-2">
-                            <label class="col-md-2 control-label">No Telepon</label>
-                            <div class="col-md-6  @error('no_telepon') has-error @enderror">
-                                {{-- <label for="no_telepon" class=" control-label">No Telepon</label> --}}
-                                <input type="text" class="form-control" id="no_telepon" name="no_telepon" placeholder=""
-                                    value="{{ old('no_telepon', $user->no_telepon) }}">
-                                <small id="no_telepon_error" class="text-danger" style="display:none;">Masukkan nomor
-                                    telepon dengan lengkap</small>
-
-                                @error('no_telepon')
-                                    <small class="form-message">
-                                        {{ $message }}
-                                    </small>
-                                @enderror
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <label for="foto" class="col-md-2 control-label">Foto</label>
-                            <div class="col-md-6">
-                                <label class="custom-file px-file" for="foto">
-                                    <input type="file" id="foto" class="custom-file-input" name="foto"
-                                        accept="image/*" onchange="previewImage()">
-
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="form-group row mt-2">
-                            <label for="tanda_tangan" class="col-md-2 control-label">Tanda Tangan</label>
-                            <div class="col-md-6">
-                                <label class="custom-file px-file" for="tanda_tangan">
-                                    <input type="file" id="tanda_tangan" class="custom-file-input" name="tanda_tangan"
-                                        accept="image/*" onchange="tandaTangan()">
-
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-md-6 offset-md-2">
-                                <div class="text-center">
-                                    @if ($user->foto)
-                                        <img src="{{ asset('storage/users/' . $user->foto) }}"
-                                            class="img-preview img-fluid mb-3 d-block mx-auto" style="max-width: 250px;">
-                                    @else
-                                        <img class="img-preview img-fluid mb-3 mx-auto" style="max-width: 250px;">
-                                    @endif
+                        @endif
+                        @if ($errors->any())
+                            <div class="alert alert-danger" role="alert">
+                                <h4 class="alert-title">Oops, terjadi kesalahan...</h4>
+                                <div class="text-muted">
+                                    <ul>
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
                                 </div>
                             </div>
+                        @endif
+
+                        <h3 class="card-title">Detail Profil</h3>
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label class="form-label">Nama</label>
+                                <input type="text" class="form-control" value="{{ $user->name }}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Username / NPM</label>
+                                <input type="text" class="form-control" value="{{ $user->username }}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email', $user->email) }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">No. Telepon (Format: 628...)</label>
+                                <input type="text" class="form-control @error('no_telepon') is-invalid @enderror" id="no_telepon" name="no_telepon" value="{{ old('no_telepon', $user->no_telepon) }}">
+                            </div>
                         </div>
 
-                        <div class="form-group row">
-                            <div class="col-md-6 offset-md-2">
-                                <div class="text-center">
-                                    @if ($user->tanda_tangan)
-                                        <img src="{{ asset('storage/tanda_tangan/' . $user->tanda_tangan) }}"
-                                            class="tanda-tangan-preview img-fluid mb-3 d-block mx-auto"
-                                            style="max-width: 250px;">
-                                    @else
-                                        <img class="tanda-tangan-preview img-fluid mb-3 mx-auto" style="max-width: 250px;">
-                                    @endif
+                        <hr class="my-4">
+
+                        <h3 class="card-title">Foto & Tanda Tangan</h3>
+                        <div class="row g-3">
+                            {{-- Preview Foto --}}
+                            <div class="col-md-6">
+                                <div class="form-label">Foto Profil</div>
+                                <div class="mb-3 p-2">
+                                    <img src="{{ $user->foto ? asset('storage/users/' . $user->foto) : 'https://via.placeholder.com/300' }}" 
+                                         alt="Preview Foto" class="img-preview avatar avatar-xl mb-2 rounded">
                                 </div>
+                                <input type="file" class="form-control" name="foto" id="foto" accept="image/*">
+                                <small class="form-hint">Maks. 2MB. Format: JPG, PNG, WEBP</small>
                             </div>
-                        </div>
 
-                        <div class="form-group row">
-                            <div class="col-md-6 col-md-offset-4">
-                                <a href="{{ route('home.index') }}" class="btn btn-xs btn-default"><i
-                                        class="fa fa-arrow-left"></i> Kembali</a>
-                                <button type="submit" class="btn btn-xs btn-warning">
-                                    <i class="fa fa-edit"></i> Update Profil
-                                </button>
+                            {{-- Preview Tanda Tangan --}}
+                            <div class="col-md-6">
+                                <div class="form-label">Tanda Tangan</div>
+                                <div class="mb-3 p-2 border rounded" style="background-color: #f8f9fa;">
+                                    <img src="{{ $user->tanda_tangan ? asset('storage/tanda_tangan/' . $user->tanda_tangan) : 'https://via.placeholder.com/300x150' }}" 
+                                         alt="Preview Tanda Tangan" class="tanda-tangan-preview img-fluid mb-2 d-block mx-auto" style="max-height: 80px;">
+                                </div>
+                                <input type="file" class="form-control" name="tanda_tangan" id="tanda_tangan" accept="image/*">
+                                <small class="form-hint">Maks. 2MB. Tanda tangan dengan background transparan disarankan.</small>
                             </div>
                         </div>
-                    </form>
-                </div>
+                    </div>
+
+                    <div class="card-footer text-end">
+                        <a href="{{ route('home.index') }}" class="btn">Kembali</a>
+                        <button type="submit" class="btn btn-warning"><i class="ti ti-device-floppy me-1"></i> Update Profil</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
-
-
-
-    @push('js')
-        <script>
-            function previewImage() {
-                const image = document.querySelector('#foto');
-                const imgPreview = document.querySelector('.img-preview');
-
-                imgPreview.style.display = 'block';
-
-                const oFReader = new FileReader();
-                oFReader.readAsDataURL(image.files[0]);
-
-                oFReader.onload = function(oFREvent) {
-                    imgPreview.src = oFREvent.target.result;
-                }
-            }
-
-            function tandaTangan() {
-                const image = document.querySelector('#tanda_tangan');
-                const imgPreview = document.querySelector('.tanda-tangan-preview');
-
-                imgPreview.style.display = 'block';
-
-                const oFReader = new FileReader();
-                oFReader.readAsDataURL(image.files[0]);
-
-                oFReader.onload = function(oFREvent) {
-                    imgPreview.src = oFREvent.target.result;
-                }
-            }
-        </script>
-
-        {{-- <script>
-            // Untuk format no telepon jadi 628
-            document.getElementById('no_telepon').addEventListener('input', function(e) {
-                let phoneNumber = e.target.value.trim();
-                // Menghapus semua karakter kecuali angka
-                phoneNumber = phoneNumber.replace(/\D/g, '');
-
-                // Mengubah nomor telepon yang dimulai dengan '08' menjadi '628'
-                if (phoneNumber.startsWith('08')) {
-                    phoneNumber = '628' + phoneNumber.slice(2);
-                }
-
-                // Memastikan panjang nomor telepon
-                if (phoneNumber.length < 10) {
-                    document.getElementById('no_telepon_error').style.display = 'block';
-                } else {
-                    document.getElementById('no_telepon_error').style.display = 'none';
-                }
-
-                // Jika panjang nomor telepon melebihi 15 digit, ambil 15 digit pertama
-                if (phoneNumber.length > 15) {
-                    phoneNumber = phoneNumber.slice(0, 15);
-                }
-
-                // Mengatur ulang nilai input dengan nomor telepon yang telah dimodifikasi
-                e.target.value = phoneNumber;
-            });
-        </script> --}}
-    @endpush
+</div>
 @endsection
+
+@push('js')
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        // --- FUNGSI PREVIEW GAMBAR UNIVERSAL ---
+        function setupImagePreview(inputId, previewClass) {
+            const imageInput = document.getElementById(inputId);
+            const imgPreview = document.querySelector(previewClass);
+
+            if (!imageInput) return;
+
+            imageInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        imgPreview.src = e.target.result;
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+        }
+
+        // Terapkan fungsi ke foto profil dan tanda tangan
+        setupImagePreview('foto', '.img-preview');
+        setupImagePreview('tanda_tangan', '.tanda-tangan-preview');
+
+        // --- FUNGSI VALIDASI NO. TELEPON ---
+        const phoneInput = document.getElementById('no_telepon');
+        if (phoneInput) {
+            phoneInput.addEventListener('input', function(e) {
+                let value = e.target.value;
+                // Hanya izinkan angka
+                value = value.replace(/\D/g, '');
+                // Ubah '08' di awal menjadi '628'
+                if (value.startsWith('08')) {
+                    value = '628' + value.slice(2);
+                }
+                e.target.value = value;
+            });
+        }
+    });
+</script>
+@endpush

@@ -145,6 +145,20 @@
                         $('#modal_show').modal('show');
                     })
             })
+
+            $(document).on("click", "#btn-delete", function() {
+                var id = $(this).attr("data-id");
+                var url = "{{ route('admin.booking.modal-delete', ':id_data') }}";
+                url = url.replace(":id_data", id);
+                $.ajax({
+                        method: "GET",
+                        url: url,
+                    })
+                    .done(function(data) {
+                        $('#tempat-modal').html(data.html);
+                        $('#modal_show').modal('show');
+                    })
+            })
         });
     </script>
 @endpush

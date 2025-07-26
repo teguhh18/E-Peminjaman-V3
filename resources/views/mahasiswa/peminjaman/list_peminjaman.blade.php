@@ -5,11 +5,10 @@
                 <th width="5%">No</th>
                 <th>Kegiatan</th>
                 <th>Waktu</th>
-                <th>Ruangan</th>
+                <th>Peminjaman</th> {{-- <-- KOLOM BARU --}}
                 <th>Status Approval</th>
                 <th>Status Peminjaman</th>
                 <th width="10%">Aksi</th>
-
             </tr>
         </thead>
         <tbody>
@@ -41,49 +40,34 @@
                         </div>
                     </td>
                     <td>
-                        @if ($peminjaman->ruangan != null)
-                            {{-- BAGIAN INI DILIHAT OLEH SEMUA ORANG --}}
-                            <div>{{ $peminjaman->ruangan->nama_ruangan }}</div>
-                            <div>{{ $peminjaman->ruangan->gedung->nama }}, Lt. {{ $peminjaman->ruangan->lantai }}</div>
-
-                            {{-- Tampilkan status kunci jika peminjaman sudah disetujui atau aktif --}}
+                        {{-- Tampilkan Ruangan jika ada --}}
+                        @if ($peminjaman->ruangan)
+                            <div>
+                                <strong>Ruang:</strong> {{ $peminjaman->ruangan->nama_ruangan }}
+                            </div>
+                            {{-- Tampilkan status kunci jika relevan --}}
                             @if (in_array($peminjaman->status_peminjaman, ['disetujui', 'aktif', 'selesai']))
-                                <div class="mt-1">
-                                    @switch($peminjaman->status_ruangan)
-                                        @case('disetujui')
-                                            <small class="text-xs badge bg-success text-yellow-fg">
-                                                <i class="fa fa-check"></i> disetujui
-                                            </small>
-                                        @break
-
-                                        @case('kunci_diambil')
-                                        <small class="text-xs badge bg-yellow text-yellow-fg">
-                                                <i class="fa fa-exclamation-circle"></i> Kunci Diambil
-                                            </small>
-                                        @break
-
-                                        @case('kunci_dikembalikan')
-                                         <small class="text-xs badge bg-blue text-yellow-fg">
-                                                <i class="fa fa-check-double"></i> Kunci Dikembalikan
-                                            </small>
-                                        @break
-
-                                        @case('bermasalah')
-                                        <small class="text-xs badge bg-red text-yellow-fg">
-                                                <i class="fa fa-exclamation-triangle"></i> Bermasalah
-                                            </small>
-                                        @break
-
-                                        @default
-                                            <small class="text-xs badge bg-yellow text-yellow-fg">
-                                                <i class="fa fa-spinner fa-spin"></i> menunggu
-                                                konfirmasi
-                                            </small>
-                                    @endswitch
-                                </div>
+                                <span class="badge bg-blue-lt">
+                                    Status Kunci:
+                                    {{ Str::title(str_replace('_', ' ', $peminjaman->status_ruangan ?? 'Disetujui')) }}
+                                </span>
                             @endif
-                        @else
-                            <small class="text-muted">Tidak Pinjam Ruangan</small>
+                        @endif
+
+                        {{-- Tampilkan Tombol Detail Barang jika ada barang yang dipinjam --}}
+                        @if (!$peminjaman->detail_peminjaman->isEmpty())
+                            <div class="{{ $peminjaman->ruangan ? 'mt-2' : '' }}">
+                                <strong>Barang:</strong>
+                                <button class="btn btn-sm btn-info btn-detail rounded"
+                                    data-id="{{ $peminjaman->id }}">
+                                    <i class="fa fa-eye me-1"></i>Detail Barang
+                                </button>
+                            </div>
+                        @endif
+
+                        {{-- Tampilkan pesan jika tidak ada aset sama sekali --}}
+                        @if (!$peminjaman->ruangan && $peminjaman->detail_peminjaman->isEmpty())
+                            <span class="text-muted">- Tidak ada aset -</span>
                         @endif
                     </td>
 

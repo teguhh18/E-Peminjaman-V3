@@ -52,6 +52,7 @@ Route::resource('/master/gedung', GedungController::class)->middleware(['auth_ad
 // Route pengelolaaann pengajuan Peminjaman/Booking
 Route::get('/master/booking/detail_barang/{id}', [BookingController::class, 'detail_barang'])->middleware(['auth_baak'])->name('admin.booking.detail');
 Route::get('/master/booking/adminKonfirmasi/{id}', [BookingController::class, 'adminKonfirmasi'])->middleware(['auth_baak'])->name('admin.booking.konfirmasi');
+Route::get('/master/booking/modal-delete/{id}', [BookingController::class, 'modalDelete'])->middleware(['auth_baak'])->name('admin.booking.modal-delete');
 Route::resource('/master/booking', BookingController::class)->middleware(['auth_baak'])->names('admin.booking');
 
 // Route Pengembalian

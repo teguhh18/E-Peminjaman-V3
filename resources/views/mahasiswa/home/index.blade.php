@@ -1,5 +1,4 @@
 @extends('layouts.tabler-front.master')
-
 @section('content')
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <div class="row">
@@ -14,10 +13,10 @@
             </div>
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">List Penggunaan Ruangan</div>
+                    <div class="card-title">List Peminjaman</div>
 
                     <div class="card-actions d-flex justify-content-end align-items-end gap-2 flex-wrap">
-                        <a href="{{ route('mahasiswa.peminjaman.create') }}" class="btn btn-success">
+                        <a href="{{ route('mahasiswa.peminjaman.create') }}" class="btn btn-teal">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round"
@@ -45,30 +44,52 @@
 
                 <div class="card-body">
                     <div class="row">
-                        @foreach ($listPeminjaman as $item)
-                            <div class="col-md-3 mb-4">
-                                <div class="card h-100 shadow-sm">
-                                    <div class="card-header bg-primary text-white">
-                                        <h5 class="card-title mb-0">{{ $item->kegiatan }}</h5>
-                                    </div>
-                                    <div class="card-body">
-                                        @if ($item->ruangan_id != null)
-                                            <p class="mb-1"><strong>Ruangan:</strong>
-                                                {{ $item->ruangan->nama_ruangan ?? '-' }}</p>
-                                        @endif
-                                        <p class="mb-1"><strong>Peminjam:</strong> {{ $item->user->name ?? '-' }}</p>
-                                        <p class="mb-0"><strong>Mulai:</strong>
-                                            {{ \Carbon\Carbon::parse($item->waktu_peminjaman)->format('d M Y H:i') }}
-                                        </p>
-                                        <p class="mb-0"><strong>Selesai:</strong>
-                                            {{ \Carbon\Carbon::parse($item->waktu_pengembalian)->format('d M Y H:i') }}
-                                        </p>
+                        @forelse ($listPeminjaman as $peminjaman)
+                            <div class="col-md-6 col-lg-4 mb-4">
+                                {{-- Card utama dengan warna yang sesuai navbar dan shadow --}}
+                                <div class="card h-100 shadow-sm border-0 bg-warning-lt">
+                                    <div class="card-body d-flex flex-column">
+                                        {{-- Judul Kegiatan --}}
+                                        <h4 class="card-title text-dark">{{ $peminjaman->kegiatan }}</h4>
+                                        <hr class="my-2">
+
+                                        {{-- Detail Peminjaman --}}
+                                        <div class="text-muted">
+                                            <p class="mb-1">
+                                                <i class="ti ti-door-enter me-1"></i>
+                                                <strong>Ruangan:</strong> {{ $peminjaman->ruangan->nama_ruangan ?? '-' }}
+                                            </p>
+                                            <p class="mb-1">
+                                                <i class="ti ti-user me-1"></i>
+                                                <strong>Peminjam:</strong> {{ $peminjaman->user->name }}
+                                            </p>
+                                            <p class="mb-1">
+                                                <i class="ti ti-calendar-event me-1"></i>
+                                                <strong>Mulai:</strong>
+                                                {{ \Carbon\Carbon::parse($peminjaman->waktu_peminjaman)->isoFormat('D MMM Y, HH:mm') }}
+                                            </p>
+                                            <p class="mb-1">
+                                                <i class="ti ti-calendar-off me-1"></i>
+                                                <strong>Selesai:</strong>
+                                                {{ \Carbon\Carbon::parse($peminjaman->waktu_pengembalian)->isoFormat('D MMM Y, HH:mm') }}
+                                            </p>
+                                        </div>
+
+                                       
                                     </div>
                                 </div>
                             </div>
-                        @endforeach
+                        @empty
+                            <div class="col-12">
+                                <div class="alert alert-info">
+                                    Tidak ada data peminjaman yang aktif saat ini.
+                                </div>
+                            </div>
+                        @endforelse
                     </div>
                 </div>
+
+
 
             </div>
 

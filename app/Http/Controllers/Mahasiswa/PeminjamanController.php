@@ -299,9 +299,16 @@ class PeminjamanController extends Controller
                 'jumlah' => $detail->jml_barang,
             ];
         });
+
+        $approvers = $peminjaman->persetujuan_peminjaman->map(function ($approver) {
+            return [
+                'id' => $approver->unitkerja_id ?? null,
+                'nama' => $approver->unit_kerja->kode,
+            ];
+        });
         // dd($peminjaman);
 
-        return view('mahasiswa.peminjaman.edit', compact('title', 'peminjaman', 'user', 'dataRuangan', 'barangPeminjaman'));
+        return view('mahasiswa.peminjaman.edit', compact('title', 'peminjaman', 'user', 'dataRuangan', 'barangPeminjaman','approvers'));
     }
 
 
@@ -412,7 +419,7 @@ class PeminjamanController extends Controller
                 PersetujuanPeminjaman::where('peminjaman_id', $peminjaman->id)->delete();
 
                 // Buat ulang persetujuan
-                $kerumahtanggan = User::where('level', 'kerumahtanggan')->firstOrFail();
+                $kerumahtanggan = User::where('level', 'kerumahtanggaan')->firstOrFail();
                 PersetujuanPeminjaman::create([
                     'peminjaman_id' => $peminjaman->id,
                     'approval_role' => 'kerumahtanggan', // pastikan string ini sesuai dengan kolom jabatan/role
@@ -420,11 +427,11 @@ class PeminjamanController extends Controller
                     'unitkerja_id'  => $kerumahtanggan->unitkerja_id
                 ]);
 
-                PersetujuanPeminjaman::create([
-                    'peminjaman_id' => $peminjaman->id,
-                    'approval_role' => 'kaprodi',
-                    'status'        => 'menunggu'
-                ]);
+                // PersetujuanPeminjaman::create([
+                //     'peminjaman_id' => $peminjaman->id,
+                //     'approval_role' => 'kaprodi',
+                //     'status'        => 'menunggu'
+                // ]);
 
                 $uniqueUnitKerjaIds = array_unique($unitKerjaIds);
                 foreach ($uniqueUnitKerjaIds as $unitKerjaId) {

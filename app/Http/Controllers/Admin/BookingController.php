@@ -218,14 +218,28 @@ class BookingController extends Controller
         ]);
     }
 
+    public function modalDelete($id)
+    {
+        $title = "Hapus Peminjaman";
+        $peminjaman = Peminjaman::where('id', $id)->first();
+        $view =  view('admin.booking.modal-delete', compact(
+            'title',
+            'peminjaman',
+        ))->render();
+        return response()->json([
+            'success' => true,
+            'html' => $view
+        ]);
+    }
     /**
      * Remove the specified resource from storage.
      *
      * @param  \App\Models\PeminjamanRuangan  $peminjamanRuangan
      * @return \Illuminate\Http\Response
      */
-    public function destroy(PeminjamanRuangan $peminjamanRuangan)
+    public function destroy($id)
     {
-        //
+        Peminjaman::where("id", $id)->delete();
+        return back()->with('msg', 'Berhasil Menghapus Data');
     }
 }

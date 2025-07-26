@@ -18,7 +18,6 @@
             <tr class="odd gradeX ">
                 <td class="center">{{ $loop->iteration }}</td>
                 <td>
-
                     {{-- Tombol Whatsapp --}}
                     <a style="margin-top: 5px;"
                         href="https://api.whatsapp.com/send?phone={{ $booking->no_peminjam }}&text=Pesan"
@@ -30,6 +29,11 @@
                             class="btn btn-sm btn-warning">
                             <i class="fa fa-edit"></i> &nbsp; Edit
                         </a>
+
+                        <span style="margin-top: 5px;" id="btn-delete" data-id="{{ $booking->id }}"
+                            class="btn btn-sm btn-danger">
+                            <i class="fa fa-trash"></i> &nbsp; Hapus
+                        </span>
                 </td>
                 <td class="center">
                     <div><b>Peminjam :</b> {{ $booking->user->name }}</div>

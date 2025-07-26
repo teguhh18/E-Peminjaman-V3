@@ -71,7 +71,6 @@ class BookingController extends Controller
             // 'events'
         ));
     }
-
     public function edit($id)
     {
         $title = "Ubah Data Booking";
@@ -86,13 +85,8 @@ class BookingController extends Controller
             'ruangan'
         ));
     }
-
-
     public function store(Request $request)
     {
-
-        // $baak = User::where('level', 'baak')->where('unitkerja_id', auth()->user()->unitkerja_id)->where('prodi_id', null)->get();
-        // dd($baak);
         // Validasi input
         $dataValid = $request->validate([
             'ruangan_id' => 'required',
@@ -174,9 +168,6 @@ class BookingController extends Controller
                 'status'        => 'menunggu'
             ]);
         }
-
-
-
         return redirect()->route('mahasiswa.ruangan.index')->with('success', 'Ruangan Berhasil Di Booking');
     }
 
@@ -218,9 +209,6 @@ class BookingController extends Controller
 
         return redirect()->route('mahasiswa.ruangan.index')->with('success', 'Berhasil Edit Booking Ruangan');
     }
-
-
-
 
     public function PrintPdf($id)
     {

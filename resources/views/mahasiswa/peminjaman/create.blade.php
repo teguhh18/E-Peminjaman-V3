@@ -17,7 +17,7 @@
 
         <div class="card">
             <div class="card-body">
-                <a class="btn btn-primary mb-2" href="{{ route('home') }}">
+                <a class="btn btn-outline-secondary mb-2" href="{{ route('home') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left">
@@ -32,8 +32,8 @@
 
                 </div>
                 <div class="card">
-                    <div class="card-header bg-primary text-blue-fg">
-                        <strong>Form Pemminjaman Ruangan & Peralatan</strong>
+                    <div class="card-header bg-azure text-blue-fg">
+                        <strong>Form Peminjaman Ruangan & Peralatan</strong>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('mahasiswa.peminjaman.store') }}" method="post" id="form-peminjaman">
@@ -128,7 +128,7 @@
                             </div>
 
                             <!-- Tombol untuk memunculkan modal -->
-                            <button type="button" class="btn btn-primary mt-3 mb-1" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-outline-azure mt-3 mb-1" data-bs-toggle="modal"
                                 data-bs-target="#modalTambahBarang" id="btnTambahBarang">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -182,7 +182,7 @@
                                 </tbody>
                             </table>
 
-                            <button type="submit" href="" class="btn btn-primary mt-2">
+                            <button type="submit" href="" class="btn btn-azure mt-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round"
