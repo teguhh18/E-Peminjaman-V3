@@ -43,9 +43,9 @@
     <script src="{{ asset('tabler/js/demo-theme.min.js?1692870487') }}"></script>
     <div class="page">
         @include('layouts.tabler-admin.sidebar')
-        @include('layouts.tabler-admin.header')
-
+        
         <div class="page-wrapper">
+            @include('layouts.tabler-admin.header')
             <div class="page-body">
                 <div class="container-xl">
                     @yield('content')

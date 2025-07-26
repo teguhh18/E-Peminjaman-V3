@@ -111,7 +111,7 @@
                         data-id="{{ $riwayat->id }}">
                         <i class="far fa-eye"></i> Detail Barang
                     </button>
-                    @switch($riwayat->konfirmasi)
+                    @switch($riwayat->status_peminjaman)
                         @case('menunggu')
                             <small class="text-xs badge bg-yellow text-yellow-fg">
                                 <i class="fa fa-spinner fa-spin"></i> menunggu
