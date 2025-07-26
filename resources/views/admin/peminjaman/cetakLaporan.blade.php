@@ -69,20 +69,20 @@
                                         @endforelse
                                     </td>
                                     <td>
-                                        @switch($peminjaman['konfirmasi'])
-                                            @case(1)
+                                        @switch($peminjaman['status_peminjaman'])
+                                            @case('menunggu')
                                                 Menunggu Konfirmasi
                                             @break
 
-                                            @case(2)
+                                            @case('disetujui')
                                                 Disetujui
                                             @break
 
-                                            @case(3)
+                                            @case('ditolak')
                                                 Ditolak
                                             @break
 
-                                            @case(4)
+                                            @case('aktif')
                                                 Aktif/Dipinjam
                                             @break
 

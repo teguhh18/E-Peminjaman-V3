@@ -61,8 +61,8 @@ Route::resource('/master/pengembalian', PengembalianController::class)->middlewa
 
 // Route Admin Bypass Tambah Peminjaman
 Route::get('/master/peminjaman/get-user', [PeminjamanController::class, 'getUser'])->name('get.user');
-Route::get('/modal-approver', [PeminjamanController::class, 'modalApprover'])->name('admin.peminjaman.modal-approver')->middleware('auth_admin');
-Route::resource('/master/peminjaman', PeminjamanController::class)->middleware(['auth_admin'])->names('admin.peminjaman');
+Route::get('/modal-approver', [PeminjamanController::class, 'modalApprover'])->name('admin.peminjaman.modal-approver')->middleware('auth_baak');
+Route::resource('/master/peminjaman', PeminjamanController::class)->middleware(['auth_baak'])->names('admin.peminjaman');
 
 // Laporan Peminjaman
 Route::get('/master/laporan', [PeminjamanController::class, 'laporan'])->middleware(['auth_admin'])->name('admin.laporan');

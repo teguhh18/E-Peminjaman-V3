@@ -23,7 +23,7 @@ class CreateUsersTable extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password', 255);
             $table->string('remember_token', 100)->nullable();
-            $table->enum('level', ['admin', 'baak', 'mahasiswa','kerumahtanggaan','kaprodi']);
+            $table->enum('level', ['admin', 'baak', 'mahasiswa','kerumahtanggaan']);
             $table->string('fakultas_kode', 255)->nullable();
             $table->string('no_telepon', 255)->nullable();
             $table->string('email_pribadi', 255)->nullable();

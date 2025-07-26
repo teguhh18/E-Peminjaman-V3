@@ -40,12 +40,11 @@
             </div>
             <div class="card-body">
                 <div class="table-primary">
+
                     @if (auth()->user()->level === 'admin')
                         @include('admin.booking.table.admin')
                     @elseif(auth()->user()->level === 'kerumahtanggaan')
                         @include('admin.booking.table.kerumahtanggaan')
-                    @elseif(auth()->user()->level === 'kaprodi')
-                        @include('admin.booking.table.kaprodi')
                     @else
                         @include('admin.booking.table.baak')
                     @endif

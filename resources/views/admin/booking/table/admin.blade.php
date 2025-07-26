@@ -59,7 +59,7 @@
                             </div>
                             {{-- Tampilkan status kunci jika relevan --}}
                             @if (in_array($booking->status_peminjaman, ['disetujui', 'aktif', 'selesai']))
-                                <span class="badge bg-blue-lt">
+                                <span class="btn badge bg-blue-lt" id="btn-status-ruangan" data-id="{{ $booking->id }}">
                                     Status :
                                     {{ Str::title(str_replace('_', ' ', $booking->status_ruangan ?? 'Disetujui')) }}
                                 </span>

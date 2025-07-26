@@ -430,7 +430,7 @@ class PeminjamanController extends Controller
         // Jika status dipilih, tambahkan kondisi where untuk status
         if ($request->filled('status')) {
             $status = $request->status;
-            $query->where('konfirmasi', $status);
+            $query->where('status_peminjaman', $status);
         }
 
         // Ambil data sesuai query

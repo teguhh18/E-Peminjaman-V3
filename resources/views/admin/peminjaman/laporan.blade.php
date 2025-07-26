@@ -22,11 +22,11 @@
                             <label for="status" class="control-label">Status</label>
                             <select name="status" id="status" class="form-control">
                                 <option value="">- Pilih Status -</option>
-                                <option value="1">Menunggu</option>
-                                <option value="2">Disetujui</option>
-                                <option value="3">Ditolak</option>
-                                <option value="4">Aktif/Dipinjam</option>
-                                <option value="5">Selesai</option>
+                                <option value="menunggu">Menunggu</option>
+                                <option value="disetujui">Disetujui</option>
+                                <option value="ditolak">Ditolak</option>
+                                <option value="aktif">Aktif/Dipinjam</option>
+                                <option value="selesai">Selesai</option>
                             </select>
                         </div>
                     </form>
@@ -98,17 +98,17 @@
                         if (response.length > 0) {
                             $.each(response, function(index, data) {
                                 var statusText = '';
-                                switch (data.konfirmasi) {
-                                    case 1:
+                                switch (data.status_peminjaman) {
+                                    case 'menunggu':
                                         statusText = 'Menunggu';
                                         break;
-                                    case 2:
+                                    case 'disetujui':
                                         statusText = 'Disetujui';
                                         break;
-                                    case 3:
+                                    case 'ditolak':
                                         statusText = 'Ditolak';
                                         break;
-                                    case 4:
+                                    case 'aktif':
                                         statusText = 'Aktif/Dipinjam';
                                         break;
                                     default:

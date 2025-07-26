@@ -128,7 +128,7 @@ class PengembalianController extends Controller
         // --- Jika status diubah menjadi "diambil" ---
         if ($request->status === 'diambil') {
             // Hanya ubah status utama jika statusnya masih 'Disetujui' (2)
-            if ($peminjaman->konfirmasi == 'disetujui') {
+            if ($peminjaman->status_peminjaman == 'disetujui') {
                 $peminjaman->update(['status_peminjaman' => 'aktif']); // 4 = Sedang Dipinjam/Aktif
             }
         }

@@ -154,10 +154,7 @@
                         @endswitch
                     </td>
                     <td>
-                        <button class="badge bg-azure text-azure-fg btn-detail mb-1" id="btn-detail"
-                            data-id="{{ $peminjaman->id }}">
-                            <i class="far fa-eye"></i> Detail Barang
-                        </button>
+                       
                         @if ($peminjaman->status_peminjaman == 'menunggu')
                             <a href="{{ route('mahasiswa.peminjaman.edit', encrypt($peminjaman->id)) }}"
                                 class="badge bg-green text-green-fg btn btn-edit" data-id="{{ $peminjaman->id }}"><i
