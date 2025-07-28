@@ -273,7 +273,6 @@ class PeminjamanController extends Controller
 
         $unitkerja = Unitkerja::whereIn('id',$uniqueUnitKerjaIds)->get();
         // dd($unitkerja);
-
        $approvers = $unitkerja->map(function ($approver) {
             return [
                 'id' => $approver->id,

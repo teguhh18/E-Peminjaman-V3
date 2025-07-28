@@ -209,10 +209,7 @@
 
                 let daftarBarang = @json($barangPeminjaman ?? []);
                 let listApprover = @json($approvers ?? []);
-                // console.log('listApprover :', listApprover);
-                // Fungsi untuk merender tabel barang dan approver dengan data awal
                 updateTabelBarang();
-                // updateTabelApprover();
                 renderTabelApprover();
 
                 $.ajaxSetup({
@@ -449,5 +446,5 @@
                 }
             });
         </script>
-    @endpush
+@endpush
 

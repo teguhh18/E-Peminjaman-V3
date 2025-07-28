@@ -74,8 +74,7 @@ class PeminjamanController extends Controller
      */
     public function store(Request $request)
     {
-        // dd($request->approver_id);
-        // 1. Validasi Awal untuk data yang selalu ada
+        // 1. Validasi Awal
         $request->validate([
             'kegiatan'           => 'required|string|max:255',
             'waktu_peminjaman'   => 'required|date',
@@ -107,7 +106,7 @@ class PeminjamanController extends Controller
             $peminjamanBaru = Peminjaman::create($dataPeminjaman);
 
             // 5. Validasi dan Simpan Detail Barang (jika ada)
-            $unitKerjaIds = []; // Array untuk menampung ID unit kerja dari aset yang dipinjam
+            $unitKerjaIds = []; // Array untuk menampung ID unit kerja dari barang yang dipinjam
 
             if ($request->has('barang_id') && is_array($request->barang_id)) {
                 $request->validate([
@@ -152,13 +151,13 @@ class PeminjamanController extends Controller
                     ]);
                 }
 
-                // Persetujuan Kerumahtanggaan (Selalu ada)
-                $kerumahtanggan = User::where('level', 'kerumahtanggaan')->firstOrFail();
-                PersetujuanPeminjaman::create([
-                    'peminjaman_id' => $peminjamanBaru->id,
-                    'status'        => 'menunggu',
-                    'unitkerja_id'        => $kerumahtanggan->unitkerja_id
-                ]);
+                // // Persetujuan Kerumahtanggaan (Selalu ada)
+                // $kerumahtanggan = User::where('level', 'kerumahtanggaan')->firstOrFail();
+                // PersetujuanPeminjaman::create([
+                //     'peminjaman_id' => $peminjamanBaru->id,
+                //     'status'        => 'menunggu',
+                //     'unitkerja_id'        => $kerumahtanggan->unitkerja_id
+                // ]);
             } else {
                 //    Jika tidak pilih approver secara manual, jalankan ini
                 // A. Persetujuan Kerumahtanggaan (Selalu ada)
@@ -167,15 +166,6 @@ class PeminjamanController extends Controller
                     'peminjaman_id' => $peminjamanBaru->id,
                     'status'        => 'menunggu',
                     'unitkerja_id'        => $kerumahtanggan->unitkerja_id
-                ]);
-
-                $user = User::find($request->user_id);
-                // B. Persetujuan Kaprodi (Berdasarkan prodi peminjam)
-                PersetujuanPeminjaman::create([
-                    'peminjaman_id' => $peminjamanBaru->id,
-                    'status'        => 'menunggu',
-                    'unitkerja_id' => $user->prodi->unitkerja_id,
-
                 ]);
 
                 // C. Persetujuan BAAK (Berdasarkan unit kerja aset yang dipinjam, unik)
@@ -197,9 +187,8 @@ class PeminjamanController extends Controller
         } catch (\Exception $e) {
             // Jika ada error di mana pun dalam blok 'try', batalkan semua
             DB::rollBack();
-
-            Log::error('Gagal menyimpan peminjaman: ' . $e->getMessage());
-
+            // simpan error di log
+            Log::error('Gagal menyimpan peminjaman: ' . $e->getMessage()); 
             return back()->with('msg', 'Terjadi kesalahan. Gagal Membuat Pengajuan Peminjaman.')->withInput();
         }
     }
@@ -223,13 +212,12 @@ class PeminjamanController extends Controller
      */
     public function edit($id)
     {
-        // dd(decrypt($id));
         $title = "Edit Form Peminjaman";
         $users = User::where('level', 'mahasiswa')->get();
-
         $peminjaman = Peminjaman::with('detail_peminjaman.barang')->where('id', decrypt($id))->firstOrFail();
-        // $approver = PersetujuanPeminjaman::with('user.unitkerja')->where('id', decrypt($id))->get();
         $dataRuangan = Ruangan::with('gedung')->where('bisa_pinjam', 1)->get();
+
+        // Ambil data barang yang sudah dipinjam sebelumnya
         $barangPeminjaman = $peminjaman->detail_peminjaman->map(function ($detail) {
             return [
                 'id' => $detail->barang_id,
@@ -237,12 +225,14 @@ class PeminjamanController extends Controller
                 'jumlah' => $detail->jml_barang,
             ];
         });
+        // Ambil data approver yang sebelumnya
         $approvers = $peminjaman->persetujuan_peminjaman->map(function ($approver) {
             return [
                 'id' => $approver->unitkerja_id ?? null,
                 'nama' => $approver->unit_kerja->kode,
+                // 'is_existing' => true
             ];
-        });
+        })->filter()->values();
         // dd($approvers);
         return view('admin.peminjaman.edit', compact('title', 'peminjaman', 'users', 'dataRuangan', 'barangPeminjaman', 'approvers'));
     }
@@ -264,6 +254,7 @@ class PeminjamanController extends Controller
             'waktu_peminjaman'   => 'required|date',
             'waktu_pengembalian' => 'required|date|after_or_equal:waktu_peminjaman',
             'no_telepon'         => 'required',
+            'approver_id'         => 'required',
         ]);
 
         try {
@@ -286,14 +277,10 @@ class PeminjamanController extends Controller
             foreach ($barangIds as $key => $barangId) {
                 $syncDataBarang[$barangId] = ['jml_barang' => $jumlahBarang[$key]];
             }
-            $peminjaman->barangs()->sync($syncDataBarang);
-
-            // =================================================================
-            // ## LOGIKA BARU UNTUK SINKRONISASI PERSETUJUAN BERDASARKAN UNIT KERJA ##
-            // =================================================================
-
+            $peminjaman->barangs()->sync($syncDataBarang); // "barangs() itu fungsi di model Peminjaman"
+            
+            // ## LOGIKA UNTUK SINKRONISASI PERSETUJUAN BERDASARKAN UNIT KERJA ##
             // 4. Kumpulkan semua ID unit kerja yang dibutuhkan untuk peminjaman INI
-
             $newUnitKerjaIds = $request->input('approver_id', []);
 
             // 5. Ambil daftar unit kerja yang LAMA dari database
@@ -319,9 +306,7 @@ class PeminjamanController extends Controller
                 ]);
             }
 
-            // =================================================================
-            // ## LOGIKA BARU: EVALUASI ULANG STATUS PEMINJAMAN ##
-            // =================================================================
+            // ## LOGIKA UNTUK EVALUASI ULANG STATUS PEMINJAMAN ##
 
             // 1. Muat ulang relasi persetujuan untuk mendapatkan data terbaru setelah diubah
             $peminjaman->load('persetujuan_peminjaman');

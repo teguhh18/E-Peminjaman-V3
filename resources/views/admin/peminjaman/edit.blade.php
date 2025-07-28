@@ -17,8 +17,8 @@
 
         <div class="card">
             <div class="card-body">
-                <a class="btn btn-primary mb-2" href="{{ route('admin.peminjaman.index') }}"><i
-                        class="fa fa-arrow-left"></i> Kembali</a>
+                <a class="btn btn-primary mb-2" href="{{ route('admin.booking.index') }}"><i class="fa fa-arrow-left"></i>
+                    Kembali</a>
                 <div class="card mb-2">
 
                 </div>
@@ -215,12 +215,14 @@
                 // ===================================================================
 
                 let daftarBarang = @json($barangPeminjaman ?? []);
-                let listApprover = @json($approvers ?? []);
-                // console.log('listApprover :', listApprover);
-                // Fungsi untuk merender tabel barang dan approver dengan data awal
+                // let dataApprover = @json($approvers ?? []);
+                let listApprover = (@json($approvers ?? [])).map(approver => {
+                    approver.is_manual = true; // Tandai semua approver awal sebagai "manual"
+                    return approver;
+                });
                 updateTabelBarang();
-                // updateTabelApprover();
-                renderTabelApprover();
+                // Fungsi untuk merender tabel barang dan approver dengan data awal
+                getAndUpdateApprovers();
 
                 $.ajaxSetup({
                     headers: {
@@ -230,13 +232,14 @@
 
                 // Inisialisasi Select2 untuk elemen yang sudah ada di halaman
                 $('#ruangan_id, #nama_id').select2({
+                    placeholder: 'Pilih',
                     theme: 'bootstrap-5',
                     allowClear: true
                 });
 
                 // 2. EVENT HANDLERS (PENANGAN AKSI PENGGUNA)
-                // Perbarui daftar approver saat ada perubahan
-                $('#ruangan_id').on('change', updateTabelApprover);
+                // Perbarui daftar approver saat ada perubahan ruangan
+                $('#ruangan_id').on('change', getAndUpdateApprovers);
 
                 // -- Manajemen Barang --
                 $(document).on("click", "#btnTambahBarang", handleModalBarang);
@@ -245,7 +248,7 @@
                     const barangId = $(this).data('id');
                     daftarBarang = daftarBarang.filter(item => item.id != barangId);
                     updateTabelBarang();
-                    updateTabelApprover();
+                    getAndUpdateApprovers();
                 });
 
                 // -- Manajemen Approver --
@@ -254,7 +257,7 @@
                 $(document).on('click', '.btn-hapus-approver', function() {
                     const approverId = parseInt($(this).data('id'));
                     listApprover = listApprover.filter(item => parseInt(item.id) !== approverId);
-                    updateTabelApprover();
+                    getAndUpdateApprovers();
                 });
 
                 // ===================================================================
@@ -362,7 +365,7 @@
                     });
 
                     updateTabelBarang(); // panggi fungsi updateTabelBarang
-                    updateTabelApprover(); // panggi fungsi updateTabelApprover
+                    getAndUpdateApprovers(); // panggi fungsi updateTabelApprover
 
                     // Reset/kosongkan input modal
                     $('#barang_id').val('').trigger('change');
@@ -383,7 +386,7 @@
                         html += `
                 <tr>
                     <td>${index + 1}</td>
-                    <td>${item.nama}<input type="hidden" name="barang_id[]" value="${item.id}"></td>
+                    <td>${item.nama}<input type="hidden" id="barang_id[]" name="barang_id[]" value="${item.id}"></td>
                     <td>${item.jumlah}<input type="hidden" name="jumlah_barang[]" value="${item.jumlah}"></td>
                     <td><button type="button" class="btn btn-danger btn-sm btn-hapus-barang" data-id="${item.id}">Hapus</button></td>
                 </tr>`;
@@ -406,15 +409,17 @@
 
                 let manuallyRemovedApprovers = [];
                 // fungsi hapus approver
-                window.hapusApprover = function (id) {
-                    // Catat ID approver yang dihapus manual ke "daftar hitam"
-                    if (!manuallyRemovedApprovers.includes(id)) {
-                        manuallyRemovedApprovers.push(id);
+                window.hapusApprover = function(id) {
+                    const approverId = parseInt(id);
+                    // Catat ID yang dihapus ke "daftar hitam" agar tidak disarankan lagi
+                    if (!manuallyRemovedApprovers.includes(approverId)) {
+                        manuallyRemovedApprovers.push(approverId);
                     }
                     // Hapus dari daftar utama
-                    listApprover = listApprover.filter(item => item.id != id);
+                    listApprover = listApprover.filter(item => parseInt(item.id) !== approverId);
                     renderTabelApprover();
                 }
+
                 function handleTambahApprover(e) {
                     e.preventDefault();
                     const approverId = $('#approver_id').val(); // value id approver yang dipilih
@@ -457,34 +462,35 @@
                     }
                 }
 
-                function updateTabelApprover() {
+                function getAndUpdateApprovers() {
                     const ruanganId = $('#ruangan_id').val();
                     const barangIds = daftarBarang.map(item => item.id);
-                    let html = '';
 
+                    // Ambil saran approver dari server
                     $.get("{{ route('mahasiswa.peminjaman.list-approver') }}", {
                         ruangan_id: ruanganId,
-                        barang_id: barangIds, //Array
-                    }, function(res) {
+                        barang_id: barangIds,
+                    }).done(function(res) {
                         const suggestions = res.approvers;
-                        // console.log('suggestions :', suggestions);
 
-                        // 1. Hapus approver lama yang merupakan saran sistem (bukan tambahan manual)
+                        // 1. Hapus saran sistem yang lama, TAPI pertahankan yang ditambah manual
                         listApprover = listApprover.filter(approver => approver.is_manual === true);
+
                         // 2. Gabungkan dengan saran baru dari server, hindari duplikasi & yang sudah dihapus manual
                         suggestions.forEach(suggestion => {
                             const isAlreadyInList = listApprover.some(item => item.id == suggestion.id);
-                            const wasManuallyRemoved = manuallyRemovedApprovers.includes(suggestion.id);
+                            const wasManuallyRemoved = manuallyRemovedApprovers.includes(parseInt(
+                                suggestion.id));
 
                             if (!isAlreadyInList && !wasManuallyRemoved) {
                                 suggestion.is_manual = false; // Tandai sebagai saran sistem
                                 listApprover.push(suggestion);
                             }
                         });
+
                         // 3. Render ulang tabel dengan daftar yang sudah diperbarui
                         renderTabelApprover();
                     });
-
                 }
 
                 function renderTabelApprover() {
@@ -505,7 +511,7 @@
                     $('#list-approver').html(html);
                 }
 
-                
+
                 // Fungsi untuk SweetAlert
                 function sweetAlert(message) {
                     const alert = Swal.fire({
