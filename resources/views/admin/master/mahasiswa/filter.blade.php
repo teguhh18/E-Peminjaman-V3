@@ -1,7 +1,7 @@
 <form method="get">
     <div class="row">
         <div class="col-md-2">
-            <div class="form-group">
+            <div class="form-group mb-2">
                 <select name="angkatan" class="form-control form-control-sm select2" required>
                     <option value="" selected disabled>Pilih</option>
                     @php
@@ -15,7 +15,7 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-4 mb-2">
             <div class="form-group">
                 <select name="prodi" class="form-control form-control-sm select2" required>
                     <option value="" selected disabled>Pilih</option>
@@ -27,7 +27,7 @@
                 </select>
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-6 mb-2">
             <div class="form-group">
                 <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i>
                     Filter</button>
