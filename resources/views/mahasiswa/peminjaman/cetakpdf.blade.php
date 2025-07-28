@@ -199,10 +199,9 @@
                 </tr>
             </thead>
             <tbody>
-                @php $rowCount = 0; @endphp
                 @if ($dataPeminjaman->ruangan)
                     <tr>
-                        <td class="text-center">{{ ++$rowCount }}</td>
+                        <td class="text-center">1</td>
                         <td><b>Ruangan Beserta Fasilitas</b></td>
                         <td></td>
                         <td></td>
@@ -210,44 +209,29 @@
                 @endif
                 @foreach ($dataPeminjaman->detail_peminjaman as $detail)
                     <tr>
-                        <td class="text-center">{{ ++$rowCount }}</td>
+                        <td class="text-center">{{ $loop->iteration + 1 }}</td>
                         <td>{{ $detail->barang->nama }}</td>
                         <td class="text-center">{{ $detail->jml_barang }}</td>
                         <td></td>
                     </tr>
                 @endforeach
-                @for ($i = $rowCount + 1; $i <= 10; $i++)
-                    <tr>
-                        <td class="text-center">{{ $i }}</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                        <td>&nbsp;</td>
-                    </tr>
-                @endfor
+               
             </tbody>
         </table>
-
-       @php
-    // Kelompokkan data persetujuan agar mudah diakses
-    $persetujuan = $dataPeminjaman->persetujuan_peminjaman;
-    $listBaak = $persetujuan->where('approval_role', 'baak');
-    $kerumahtanggaan = $persetujuan->where('approval_role', 'kerumahtanggan')->first();
-    $kaprodi = $persetujuan->where('approval_role', 'kaprodi')->first();
-@endphp
 
 <table class="signature-table">
     <tr>
         {{-- Loop untuk setiap BAAK/Tata Usaha --}}
-        @foreach($listBaak as $baak)
+        @foreach($dataPeminjaman->persetujuan_peminjaman as $persetujuan)
             <td>
-                <div>Tata Usaha {{ $baak->unit_kerja->kode ?? '' }}</div>
+                <div>Tata Usaha {{ $persetujuan->unit_kerja->kode ?? '' }}</div>
                 <div class="signature-cell">
-                    @if($baak?->status == 'disetujui' && $baak?->user?->tanda_tangan)
-                        <img src="{{ asset('storage/tanda_tangan/' . $baak->user->tanda_tangan) }}" alt="TTD">
+                    @if($persetujuan->status == 'disetujui' && $persetujuan?->user?->tanda_tangan)
+                        <img src="{{ asset('storage/tanda_tangan/' . $persetujuan->user->tanda_tangan) }}" alt="TTD">
                     @endif
 
-                    @if($baak?->status == 'disetujui' && $baak?->user)
-                        <u>{{ $baak->user->name }}</u>
+                    @if($persetujuan->status == 'disetujui' && $persetujuan?->user)
+                        <u>{{ $persetujuan->user->name }}</u>
                     @else
                         (.....................)
                     @endif
@@ -263,41 +247,6 @@
                      <img src="{{ asset('storage/tanda_tangan/' . $dataPeminjaman->user->tanda_tangan) }}" alt="TTD">
                 @endif
                 <u>{{ $dataPeminjaman->user->name }}</u>
-            </div>
-        </td>
-    </tr>
-</table>
-
-<table class="signature-table">
-     <tr>
-        <td style="width: 50%;">
-            <div>Menyetujui,</div>
-            <div>Ka. Kerumahtanggaan</div>
-            <div class="signature-cell">
-                @if($kerumahtanggaan?->status == 'disetujui' && $kerumahtanggaan?->user?->tanda_tangan)
-                    <img src="{{ asset('storage/tanda_tangan/' . $kerumahtanggaan->user->tanda_tangan) }}" alt="TTD">
-                @endif
-
-                @if($kerumahtanggaan?->status == 'disetujui' && $kerumahtanggaan?->user)
-                    <u>{{ $kerumahtanggaan->user->name }}</u>
-                @else
-                    (.....................)
-                @endif
-            </div>
-        </td>
-        <td style="width: 50%;">
-            <div>Menyetujui,</div>
-            <div>Ka. Prodi {{ $dataPeminjaman->user->prodi->kode_prodi ?? '' }}</div>
-            <div class="signature-cell">
-                @if($kaprodi?->status == 'disetujui' && $kaprodi?->user?->tanda_tangan)
-                    <img src="{{ asset('storage/tanda_tangan/' . $kaprodi->user->tanda_tangan) }}" alt="TTD">
-                @endif
-                
-                @if($kaprodi?->status == 'disetujui' && $kaprodi?->user)
-                    <u>{{ $kaprodi->user->name }}</u>
-                @else
-                    (.....................)
-                @endif
             </div>
         </td>
     </tr>

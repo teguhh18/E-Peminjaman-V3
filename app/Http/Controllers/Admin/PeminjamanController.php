@@ -151,10 +151,18 @@ class PeminjamanController extends Controller
                         'status'        => 'menunggu'
                     ]);
                 }
+
+                // Persetujuan Kerumahtanggaan (Selalu ada)
+                $kerumahtanggan = User::where('level', 'kerumahtanggaan')->firstOrFail();
+                PersetujuanPeminjaman::create([
+                    'peminjaman_id' => $peminjamanBaru->id,
+                    'status'        => 'menunggu',
+                    'unitkerja_id'        => $kerumahtanggan->unitkerja_id
+                ]);
             } else {
                 //    Jika tidak pilih approver secara manual, jalankan ini
                 // A. Persetujuan Kerumahtanggaan (Selalu ada)
-                $kerumahtanggan = User::where('level', 'kerumahtanggan')->firstOrFail();
+                $kerumahtanggan = User::where('level', 'kerumahtanggaan')->firstOrFail();
                 PersetujuanPeminjaman::create([
                     'peminjaman_id' => $peminjamanBaru->id,
                     'status'        => 'menunggu',
@@ -248,8 +256,6 @@ class PeminjamanController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // dd($request->approver_id);
-        // Decrypt ID
         $id = decrypt($id);
 
         // 1. Validasi dasar
@@ -260,145 +266,89 @@ class PeminjamanController extends Controller
             'no_telepon'         => 'required',
         ]);
 
-        // 2. Cek minimal satu item (ruangan atau barang)
-        if (!$request->filled('ruangan_id') && !$request->has('barang_id')) {
-            return back()->with('msg', 'Anda harus memilih minimal satu ruangan atau satu barang untuk dipinjam.')->withInput();
-        }
-
         try {
             DB::beginTransaction();
 
-            // 3. Temukan peminjaman yang akan diupdate
-            $peminjaman = Peminjaman::with('detail_peminjaman')->findOrFail($id);
+            $peminjaman = Peminjaman::with('persetujuan_peminjaman')->findOrFail($id);
 
-            // 4. Simpan data lama untuk pengecekan perubahan
-            $oldRuanganId = $peminjaman->ruangan_id;
-            $oldStart = $peminjaman->waktu_peminjaman;
-            $oldEnd = $peminjaman->waktu_pengembalian;
-            $oldBarang = $peminjaman->detail_peminjaman->pluck('barang_id')->toArray();
-
-            // 5. Update data utama peminjaman
+            // 2. Update data utama peminjaman
             $peminjaman->update([
                 'kegiatan'           => $request->kegiatan,
-                'no_peminjam'        => $request->no_telepon,
                 'waktu_peminjaman'   => date('Y-m-d H:i:s', strtotime($request->waktu_peminjaman)),
                 'waktu_pengembalian' => date('Y-m-d H:i:s', strtotime($request->waktu_pengembalian)),
                 'ruangan_id'         => $request->ruangan_id,
             ]);
 
-            // 6. Handle perubahan detail barang
-            $unitKerjaIds = [];
-            $newBarangIds = $request->barang_id ?? [];
+            // 3. Sinkronisasi detail barang (gunakan sync() agar lebih bersih)
+            $barangIds = $request->input('barang_id', []);
+            $jumlahBarang = $request->input('jumlah_barang', []);
+            $syncDataBarang = [];
+            foreach ($barangIds as $key => $barangId) {
+                $syncDataBarang[$barangId] = ['jml_barang' => $jumlahBarang[$key]];
+            }
+            $peminjaman->barangs()->sync($syncDataBarang);
 
-            // 6a. Hapus barang yang dihapus dari peminjaman
-            foreach ($peminjaman->detail_peminjaman as $detail) {
-                if (!in_array($detail->barang_id, $newBarangIds)) {
-                    $detail->delete();
-                }
+            // =================================================================
+            // ## LOGIKA BARU UNTUK SINKRONISASI PERSETUJUAN BERDASARKAN UNIT KERJA ##
+            // =================================================================
+
+            // 4. Kumpulkan semua ID unit kerja yang dibutuhkan untuk peminjaman INI
+
+            $newUnitKerjaIds = $request->input('approver_id', []);
+
+            // 5. Ambil daftar unit kerja yang LAMA dari database
+            $oldUnitKerjaIds = $peminjaman->persetujuan_peminjaman->pluck('unitkerja_id')->toArray();
+
+            // 6. Bandingkan untuk menemukan apa yang harus ditambah dan dihapus
+            $idsToAdd = array_diff($newUnitKerjaIds, $oldUnitKerjaIds);
+            $idsToRemove = array_diff($oldUnitKerjaIds, $newUnitKerjaIds);
+
+            // 7. Hapus persetujuan yang unit kerjanya sudah tidak relevan
+            if (!empty($idsToRemove)) {
+                PersetujuanPeminjaman::where('peminjaman_id', $peminjaman->id)
+                    ->whereIn('unitkerja_id', $idsToRemove)
+                    ->delete();
             }
 
-            // 6b. Tambahkan/update barang yang ada
-            if ($request->has('barang_id') && is_array($request->barang_id)) {
-                foreach ($request->barang_id as $index => $barangId) {
-                    $jmlBarang = $request->jumlah_barang[$index] ?? 1;
-
-                    // Cek apakah barang sudah ada
-                    $existingDetail = Detailpeminjaman::where([
-                        'peminjaman_id' => $peminjaman->id,
-                        'barang_id' => $barangId
-                    ])->first();
-
-                    if ($existingDetail) {
-                        // Update jumlah jika berbeda
-                        if ($existingDetail->jml_barang != $jmlBarang) {
-                            $existingDetail->update(['jml_barang' => $jmlBarang]);
-                        }
-                    } else {
-                        // Tambahkan baru
-                        Detailpeminjaman::create([
-                            'peminjaman_id' => $peminjaman->id,
-                            'barang_id'     => $barangId,
-                            'jml_barang'    => $jmlBarang,
-                        ]);
-                    }
-
-                    // Kumpulkan unit kerja
-                    $barang = Barang::find($barangId);
-                    if ($barang && $barang->ruangan->unitkerja_id) {
-                        $unitKerjaIds[] = $barang->ruangan->unitkerja_id;
-                    }
-                }
+            // 8. Tambahkan persetujuan baru untuk unit kerja yang baru ditambahkan
+            foreach ($idsToAdd as $unitKerjaId) {
+                PersetujuanPeminjaman::create([
+                    'peminjaman_id' => $peminjaman->id,
+                    'unitkerja_id'  => $unitKerjaId,
+                    'status'        => 'menunggu'
+                ]);
             }
 
-            // 7. Kumpulkan unit kerja dari ruangan (jika ada)
-            if ($request->filled('ruangan_id')) {
-                $ruangan = Ruangan::find($request->ruangan_id);
-                if ($ruangan && $ruangan->unitkerja_id) {
-                    $unitKerjaIds[] = $ruangan->unitkerja_id;
-                }
-            }
+            // =================================================================
+            // ## LOGIKA BARU: EVALUASI ULANG STATUS PEMINJAMAN ##
+            // =================================================================
 
-            // 8. Cek apakah perlu mereset persetujuan
-            $significantChange = false;
-            $changes = [
-                'ruangan' => ($oldRuanganId != $request->ruangan_id),
-                'waktu_mulai' => ($oldStart != $request->waktu_peminjaman),
-                'waktu_selesai' => ($oldEnd != $request->waktu_pengembalian),
-                'barang' => ($oldBarang != $newBarangIds)
-            ];
+            // 1. Muat ulang relasi persetujuan untuk mendapatkan data terbaru setelah diubah
+            $peminjaman->load('persetujuan_peminjaman');
+            $semuaPersetujuan = $peminjaman->persetujuan_peminjaman;
 
-            if (in_array(true, $changes)) {
-                $significantChange = true;
+            // 2. Cek kondisi
+            $adaYangMenunggu = $semuaPersetujuan->contains('status', 'menunggu');
+            $semuaMenyetujui = !$adaYangMenunggu && !$semuaPersetujuan->isEmpty(); // Benar jika tidak ada yang menunggu & daftar tidak kosong
 
-                // Hapus semua persetujuan lama
-                PersetujuanPeminjaman::where('peminjaman_id', $peminjaman->id)->delete();
-
-                // Buat ulang persetujuan
-                if ($request->approver_id != null)  {
-                    foreach ($request->approver_id as $approvers) {
-                    $approver = Unitkerja::find($approvers);
-                    PersetujuanPeminjaman::create([
-                        'peminjaman_id' => $peminjaman->id,
-                        // Anda mungkin perlu menyimpan target unit kerja di sini jika ada beberapa BAAK per unit
-                        'unitkerja_id' => $approver->id,
-                        'status'        => 'menunggu'
-                    ]);
-                }
-                } else {
-                    //    Jika tidak pilih approver secara manual, jalankan ini
-                    // A. Persetujuan Kerumahtanggaan (Selalu ada)
-                    $kerumahtanggan = User::where('level', 'kerumahtanggan')->firstOrFail();
-                    PersetujuanPeminjaman::create([
-                        'peminjaman_id' => $peminjaman->id,
-                        'status'        => 'menunggu',
-                        'unitkerja_id'        => $kerumahtanggan->unitkerja_id
-                    ]);
-
-                    // B. Persetujuan BAAK (Berdasarkan unit kerja aset yang dipinjam, unik)
-                    $uniqueUnitKerjaIds = array_unique($unitKerjaIds);
-                    foreach ($uniqueUnitKerjaIds as $unitKerjaId) {
-                        PersetujuanPeminjaman::create([
-                            'peminjaman_id' => $peminjaman->id,
-                            // Anda mungkin perlu menyimpan target unit kerja di sini jika ada beberapa BAAK per unit
-                            'unitkerja_id' => $unitKerjaId,
-                            'status'        => 'menunggu'
-                        ]);
-                    }
-                }
+            // 3. Tetapkan status akhir yang benar
+            if ($adaYangMenunggu) {
+                // Jika ada satu saja yang masih menunggu
+                // kembalikan status utama ke 'menunggu_persetujuan'.
+                $peminjaman->update(['status_peminjaman' => 'menunggu']);
+            } elseif ($semuaMenyetujui) {
+                // Jika tidak ada yang menunggu (artinya semua sudah disetujui),
+                // tetapkan status utama menjadi 'disetujui'.
+                $peminjaman->update(['status_peminjaman' => 'disetujui']);
             }
 
             DB::commit();
 
-            $message = 'Berhasil Memperbarui Pengajuan Peminjaman';
-            if ($significantChange) {
-                $message .= '. Perubahan signifikan memerlukan persetujuan ulang';
-            }
-
-            return redirect()->route('admin.booking.index')->with('msg', $message);
+            return redirect()->route('admin.booking.index')->with('msg', 'Berhasil memperbarui pengajuan.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Gagal memperbarui peminjaman: ' . $e->getMessage());
-            return back()->with('msg', 'Terjadi kesalahan. Gagal Memperbarui Pengajuan Peminjaman.')->withInput();
+            return back()->with('msg', 'Terjadi kesalahan. Gagal memperbarui pengajuan.')->withInput();
         }
     }
 

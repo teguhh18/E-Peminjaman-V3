@@ -26,8 +26,17 @@ class Peminjaman extends Model
         return $this->belongsTo(Ruangan::class);
     }
 
-     public function persetujuan_peminjaman()
+    public function persetujuan_peminjaman()
     {
         return $this->hasMany(PersetujuanPeminjaman::class, 'peminjaman_id');
+    }
+
+    // app/Models/Peminjaman.php
+
+    public function barangs()
+    {
+        return $this->belongsToMany(Barang::class, 'detailpeminjaman_barangs')
+            ->withPivot('jml_barang') // Sertakan kolom tambahan dari tabel pivot
+            ->withTimestamps();
     }
 }
