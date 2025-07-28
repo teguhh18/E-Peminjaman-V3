@@ -79,12 +79,12 @@
                                             if ($user->level === 'admin') {
                                                $isMyApproval = true;
                                             }
-                                            elseif ($user->level === 'baak') {
+                                            elseif ($user->level === 'baak' && $user->unitkerja_id == $detail->barang->unitkerja_id) {
                                                 $isMyApproval = true;
                                             }
                                         @endphp
 
-                                        @if ($isMyApproval)
+                                        @if ($isMyApproval && $detail->peminjaman->status_peminjaman != 'menunggu')
                                             <span class="btn badge {{ $bg }} d-inline-block mb-1 text-light" id="btn-status-barang" data-id="{{ $detail->id }}">
                                                 <i class="{{ $icon }}"></i> {{ $detail->status ?? 'menunggu' }}
                                             </span>
@@ -96,7 +96,6 @@
                                             </span>
                                         @endif
                                     </td>
-
                                 </tr>
                             @endforeach
                         </tbody>

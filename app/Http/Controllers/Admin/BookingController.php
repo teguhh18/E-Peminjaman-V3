@@ -33,24 +33,14 @@ class BookingController extends Controller
             // dd($dataBooking);
 
         } else {
-            // Ambil semua peminjaman yang terkait dengan unit kerja/baak (ruangan/barang)
-            $dataBooking = Peminjaman::whereNotIn('status_peminjaman', ['selesai', 'ditolak'])->where(function ($query) use ($user) {
-                $query->whereHas('ruangan', function ($q) use ($user) {
-                    $q->where('unitkerja_id', $user->unitkerja_id);
-                })->orWhereHas('detail_peminjaman.barang.ruangan', function ($q) use ($user) {
-                    $q->where('unitkerja_id', $user->unitkerja_id);
-                });
-            })->with([
-                'user',
-                'ruangan.gedung',
-                'persetujuan_peminjaman',
-                'detail_peminjaman.barang.ruangan'
-            ])
+            // Ambil peminjaman yang memiliki persetujuan untuk unit kerja user yang login
+            $dataBooking = Peminjaman::whereNotIn('status_peminjaman', ['selesai', 'ditolak'])
+                ->whereHas('persetujuan_peminjaman', function ($query) use ($user) {
+                    $query->where('unitkerja_id', $user->unitkerja_id);
+                })
+                ->with(['user', 'ruangan.gedung', 'persetujuan_peminjaman'])
                 ->orderBy('id', 'desc')
                 ->get();
-            // $dataBooking = Peminjaman::whereNotIn('status_peminjaman', ['selesai', 'ditolak'])->with('persetujuan_peminjaman', function ($query) use ($user) {
-            //     $query->where('unitkerja_id', $user->unitkerja_id);
-            // })->get();
         }
 
         // dd($dataBooking);
