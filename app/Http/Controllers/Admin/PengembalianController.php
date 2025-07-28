@@ -70,9 +70,9 @@ class PengembalianController extends Controller
         // --- Logika kondisional berdasarkan status baru ---
 
         // Jika status diubah menjadi "kunci_diambil"
-        if ($request->status === 'kunci_diambil') {
+        if ($request->status == 'kunci_diambil') {
             // Hanya ubah status utama jika statusnya masih 'Disetujui' (2)
-            if ($peminjaman->konfirmasi == 'disetujui') {
+            if ($peminjaman->status_peminjaman == 'disetujui') {
                 $peminjaman->update(['status_peminjaman' => 'aktif']); // 4 = Aktif/Sedang Dipinjam
             }
         }
@@ -81,7 +81,7 @@ class PengembalianController extends Controller
             // Panggil fungsi bantuan untuk mengecek apakah seluruh peminjaman sudah selesai
             $this->cekDanSelesaikanPeminjaman($peminjaman);
         }
-        // Jika status "bermasalah", tidak ada aksi pada status utama.
+        // Jika status "bermasalah",BELUM
 
         return back()->with('success', 'Status ruangan berhasil diperbarui.');
     }

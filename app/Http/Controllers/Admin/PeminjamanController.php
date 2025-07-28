@@ -150,14 +150,6 @@ class PeminjamanController extends Controller
                         'status'        => 'menunggu'
                     ]);
                 }
-
-                // // Persetujuan Kerumahtanggaan (Selalu ada)
-                // $kerumahtanggan = User::where('level', 'kerumahtanggaan')->firstOrFail();
-                // PersetujuanPeminjaman::create([
-                //     'peminjaman_id' => $peminjamanBaru->id,
-                //     'status'        => 'menunggu',
-                //     'unitkerja_id'        => $kerumahtanggan->unitkerja_id
-                // ]);
             } else {
                 //    Jika tidak pilih approver secara manual, jalankan ini
                 // A. Persetujuan Kerumahtanggaan (Selalu ada)
@@ -188,7 +180,7 @@ class PeminjamanController extends Controller
             // Jika ada error di mana pun dalam blok 'try', batalkan semua
             DB::rollBack();
             // simpan error di log
-            Log::error('Gagal menyimpan peminjaman: ' . $e->getMessage()); 
+            Log::error('Gagal menyimpan peminjaman: ' . $e->getMessage());
             return back()->with('msg', 'Terjadi kesalahan. Gagal Membuat Pengajuan Peminjaman.')->withInput();
         }
     }
@@ -225,14 +217,31 @@ class PeminjamanController extends Controller
                 'jumlah' => $detail->jml_barang,
             ];
         });
-        // Ambil data approver yang sebelumnya
-        $approvers = $peminjaman->persetujuan_peminjaman->map(function ($approver) {
-            return [
-                'id' => $approver->unitkerja_id ?? null,
-                'nama' => $approver->unit_kerja->kode,
-                // 'is_existing' => true
-            ];
-        })->filter()->values();
+        // 1. Kumpulkan semua ID unit kerja dari aset yang dipinjam
+        $assetUnitKerjaIds = [];
+        if ($peminjaman->ruangan) {
+            $assetUnitKerjaIds[] = $peminjaman->ruangan->unitkerja_id;
+        }
+        foreach ($peminjaman->detail_peminjaman as $detail) {
+            if ($detail->barang) {
+                $assetUnitKerjaIds[] = $detail->barang->unitkerja_id;
+            }
+        }
+        $uniqueAssetUnitKerjaIds = array_unique($assetUnitKerjaIds);
+
+        // 2. Filter persetujuan untuk mendapatkan approver "tambahan" (manual)
+        $approvers = $peminjaman->persetujuan_peminjaman
+            ->filter(function ($persetujuan) use ($uniqueAssetUnitKerjaIds) {
+                // Ambil persetujuan HANYA JIKA unitkerja_id-nya TIDAK ADA di dalam daftar unit kerja aset
+                return !in_array($persetujuan->unitkerja_id, $uniqueAssetUnitKerjaIds);
+            })
+            ->map(function ($approver) {
+                // Format data yang sudah difilter
+                return [
+                    'id'   => $approver->unitkerja_id,
+                    'nama' => $approver->unit_kerja->kode,
+                ];
+            })->values();
         // dd($approvers);
         return view('admin.peminjaman.edit', compact('title', 'peminjaman', 'users', 'dataRuangan', 'barangPeminjaman', 'approvers'));
     }
@@ -278,7 +287,7 @@ class PeminjamanController extends Controller
                 $syncDataBarang[$barangId] = ['jml_barang' => $jumlahBarang[$key]];
             }
             $peminjaman->barangs()->sync($syncDataBarang); // "barangs() itu fungsi di model Peminjaman"
-            
+
             // ## LOGIKA UNTUK SINKRONISASI PERSETUJUAN BERDASARKAN UNIT KERJA ##
             // 4. Kumpulkan semua ID unit kerja yang dibutuhkan untuk peminjaman INI
             $newUnitKerjaIds = $request->input('approver_id', []);
