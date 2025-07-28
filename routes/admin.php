@@ -75,9 +75,7 @@ Route::get('/master/jadwal/filter', [JadwalController::class, 'filter'])->middle
 
 
 Route::resource('/master/user', UserController::class)->middleware(['auth_admin'])->names('admin.user');
-Route::post('/master/import_mahasiswa', [UserController::class, 'import_mahasiswa'])->middleware(['auth_admin'])->name('admin.import_mahasiswa');
-Route::get('/master/list_mahasiswa', [UserController::class, 'list_mahasiswa'])->middleware(['auth_admin'])->name('admin.list_mahasiswa');
-Route::resource('/master/mahasiswa', MahasiswaController::class)->middleware(['auth_admin'])->names('admin.mahasiswa');
-
 Route::resource('/master/unit', UnitkerjaController::class)->middleware(['auth_admin'])->names('admin.unit');
 Route::resource('/master/prodi', ProdiController::class)->middleware(['auth_admin'])->names('admin.prodi');
+
+Route::resource('/mahasiswa', MahasiswaController::class)->middleware(['auth_admin'])->names('admin.mahasiswa');

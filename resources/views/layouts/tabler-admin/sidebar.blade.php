@@ -7,7 +7,7 @@
             <span class="navbar-toggler-icon"></span>
         </button>
         <h1 class="navbar-brand ">
-            <a href=".">
+            <a href="#">
                 <img src="{{ asset('logo-brand.png') }}" width="110" height="32" alt="Tabler"
                     class="navbar-brand-image">
             </a>
@@ -60,7 +60,8 @@
                         <div class="dropdown-menu show">
                             <div class="dropdown-menu-columns">
                                 <div class="dropdown-menu-column">
-                                    <a class="dropdown-item {{ request()->routeIs('admin.booking.*') ? 'active' : '' }}" href="{{ route('admin.booking.index') }}">
+                                    <a class="dropdown-item {{ request()->routeIs('admin.booking.*') ? 'active' : '' }}"
+                                        href="{{ route('admin.booking.index') }}">
                                         Peminjaman
                                     </a>
                                 </div>
@@ -87,8 +88,6 @@
                         </div>
                     </li>
                 @endif
-
-
             </ul>
         </div>
     </div>

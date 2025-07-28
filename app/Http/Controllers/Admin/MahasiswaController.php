@@ -5,64 +5,42 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Unitkerja;
 use App\Models\User;
+use App\Models\Mahasiswa;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Auth;
 
 class MahasiswaController extends Controller
 {
 
-    public function list_mahasiwa($angkatan)
-    {
-        $title = "Data Mahasiswa";
-        $url = env("URL_SISFO") . "/api/mahasiswa.php?angkatan=" . $angkatan;
-        return $dataMahasiswa = json_decode(file_get_contents($url));
-    }
-    
-    public function list_prodi()
-    {
-        $title = "Data Mahasiswa";
-        $uriProdi = env('URL_SISFO') . '/api/programstudi.php?id_prodi=ALL';
-
-        return $dataProdi = json_decode(file_get_contents($uriProdi));
-         
-    }
-
     public function index(Request $request)
     {
         $title = "Data Mahasiswa";
-        // $dataUser = User::with('unitkerja')->where('level', 'mahasiswa')->get();
-        // dd($this->list_mahasiwa(20)->data);
-        $dataProdi = $this->list_prodi();
+        if (!empty(Auth::user()->fakultas_kode)) {
+            $uriProdi = env('API') . '/api/prodi/getFakultasId?fakultas_id=' . Auth::user()->fakultas_kode;
+        } else {
+            $uriProdi = env('API') . '/api/prodi';
+        }
+        $dataProdi = json_decode(file_get_contents($uriProdi));
 
         if (isset($request->prodi)) {
             $angkatan = $request->angkatan;
             $idProdi = $request->prodi;
-            $prodinya = array_filter($dataProdi->data, function ($item) use ($idProdi) {
-                return $item->id_prodi == $idProdi;
-            });
-            $prodiSelect = reset($prodinya);
-            $dataMahasiswa = User::where("kode_prodi", $request->prodi)
-                ->whereRaw("LEFT(username,2) = '$angkatan'")
+            $dataMahasiswa = Mahasiswa::where("kode_program_studi", $request->prodi)
+                ->whereRaw("LEFT(npm_mahasiswa,2) = '$angkatan'")
                 ->get();
         } else {
-            $dataMahasiswa = User::limit(0)->get();
-            $prodiSelect = false;
+            $dataMahasiswa = Mahasiswa::limit(0)->get();
             $idProdi = false;
             $angkatan = false;
         }
-
-
-        // dd($dataUser);
-        return view('admin.mahasiswa.data', compact(
+        return view('admin.master.mahasiswa.index', compact(
             'title',
-            // 'dataUser',
             'dataMahasiswa',
             'dataProdi',
             'angkatan',
-            'idProdi',
-            'prodiSelect'
+            'idProdi'
         ));
     }
 
@@ -84,40 +62,42 @@ class MahasiswaController extends Controller
      */
     public function store(Request $request)
     {
-        ini_set('max_execution_time', '500');
-        $dataMahasiswa = $this->list_mahasiwa($request->angkatan);
-        // dd($dataMahasiswa->data);
-
+        ini_set('max_execution_time', '5000');
+        $url = env("API") . "/api/mahasiswa?angkatan=" . $request->angkatan;
+        $dataMahasiswa = json_decode(file_get_contents($url));
         foreach ($dataMahasiswa->data as $key) {
             $cekData = User::where("username", $key->npm);
             if ($cekData->count() > 0) {
-                User::where("id", $cekData->first()->id)->update([
-                    'username' => $key->npm,
-                    'name' => $key->nama,
-                    'level' => 'mahasiswa',
-                    'password' => Hash::make($key->npm),
+                Mahasiswa::where("user_id", $cekData->first()->id)->update([
+                    'kode_program_studi' => $key->id_prodi,
+                    'nama_program_studi' => $key->nama_prodi,
                     'kode_fakultas' => $key->id_fakultas,
-                    'kode_prodi' => $key->id_prodi,
                     'nama_fakultas' => $key->nama_fakultas,
-                    'nama_prodi' => $key->nama_prodi,
-                    'angkatan' => $request->angkatan,
+                    'nama_program_studi_english' => $key->nama_prodi_eng,
+                    'nama_fakultas_english' => $key->nama_fakultas_eng,
                 ]);
             } else {
-                User::create([
+                $akun = User::create([
                     'username' => $key->npm,
                     'email' => $key->npm . "@teknokrat.ac.id",
                     'name' => $key->nama,
                     'level' => 'mahasiswa',
                     'password' => Hash::make($key->npm),
+                ]);
+
+                Mahasiswa::create([
+                    'npm_mahasiswa' => $key->npm,
+                    'nama_mahasiswa' => $key->nama,
+                    'kode_program_studi' => $key->id_prodi,
+                    'nama_program_studi' => $key->nama_prodi,
                     'kode_fakultas' => $key->id_fakultas,
-                    'kode_prodi' => $key->id_prodi,
                     'nama_fakultas' => $key->nama_fakultas,
-                    'nama_prodi' => $key->nama_prodi,
-                    'angkatan' => $request->angkatan,
+                    'nama_program_studi_english' => $key->nama_prodi_eng,
+                    'nama_fakultas_english' => $key->nama_fakultas_eng,
+                    'user_id' => $akun->id,
                 ]);
             }
         }
-
         return back()->with(['msg' => 'Sinkronisasi Berhasil', 'class' => 'alert-success']);
     }
 
@@ -144,15 +124,7 @@ class MahasiswaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
-    {
-        $title = "Edit Data Mahasiswa";
-        $mahasiswa = User::with('unitkerja')->where("id", $id)->first();
-        $unitKerja = Unitkerja::all();
-        // dd($dataGedung->id);
-        $view = view('admin.mahasiswa.update', compact('title', 'mahasiswa', 'unitKerja'));
-        return $view;
-    }
+    public function edit($id) {}
 
     /**
      * Update the specified resource in storage.
@@ -163,53 +135,11 @@ class MahasiswaController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $dataUser = User::findOrFail($id);
-
-        $validatedData = $request->validate([
-            'name'      => 'required|max:255',
-            'no_telepon' => 'required',
-            // 'foto'      => 'image|file|max:2048',
+        $user = User::findorfail($id);
+        $user->update([
+            'password' => Hash::make($user->username),
         ]);
-        // dd($validatedData);
-
-        if ($request->password) {
-            $validatedData['password'] = Hash::make($request->password);
-        }
-
-        if ($request->unitkerja_id) {
-            $validatedData['unitkerja_id'] = $request->unitkerja_id;
-        }
-
-        // Jika email yang dimasukkan bukan milik pengguna yang sedang diupdate
-        if ($request->email != $dataUser->email) {
-            // Periksa apakah email sudah terpakai
-            $existingEmail = User::where('email', $request->email)->first();
-
-            // Jika email sudah digunakan dan bukan milik pengguna yang sedang diupdate
-            if ($existingEmail && $existingEmail->id !== $dataUser->id) {
-                return redirect()->back()->withInput()->withErrors(['email' => 'Email sudah terpakai']);
-            } else {
-                $validatedData['email'] = $request->email;
-            }
-        }
-
-        // dd($validatedData);
-
-        if ($request->hasFile('foto')) {
-            // Validasi tipe file harus image
-            $request->validate([
-            'foto' => 'image|mimes:jpeg,png,jpg,gif,svg|max:2048',
-            ]);
-
-            if ($dataUser->foto) {
-            Storage::delete('public/users/' . $dataUser->foto);
-            }
-            $validatedData['foto'] = $validatedData['name'] . "-" . date('His') . "new." . $request->file('foto')->getClientOriginalExtension();
-            $request->file('foto')->storeAs('public/users', $validatedData['foto']);
-        }
-        $dataUser->update($validatedData);
-
-        return redirect()->route('admin.mahasiswa.index')->with(['msg' => 'Data Berhasil Diubah', 'class' => 'alert-success']);
+        return back()->with(['msg' => 'Reset Password Berhasil', 'class' => 'alert-success']);
     }
 
     /**
@@ -218,13 +148,5 @@ class MahasiswaController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
-    {
-        $mahasiswa = User::findOrFail($id);
-        if ($mahasiswa->foto) {
-            Storage::delete('public/users/' . $mahasiswa->foto);
-        }
-        $mahasiswa->delete();
-        return back()->with(['msg' => 'Berhasil Menghapus Mahasiswa', 'class' => 'success']);
-    }
+    public function destroy($id) {}
 }
