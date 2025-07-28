@@ -9,7 +9,6 @@
     <title>{{ isset($title) ? $title : 'E-Peminjaman' }}</title>
     <!-- CSS files -->
     <link rel="shortcut icon" href="{{ asset('logo.png') }}" type="image/x-icon">
-
     <link href="{{ asset('tabler/css/tabler.min.css?1692870487') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/css/tabler-flags.min.css?1692870487') }}" rel="stylesheet" />
     <link href="{{ asset('tabler/css/tabler-payments.min.css?1692870487') }}" rel="stylesheet" />
@@ -44,7 +43,6 @@
     <script src="{{ asset('tabler/js/demo-theme.min.js?1692870487') }}"></script>
     <div class="page">
         @include('layouts.tabler-admin.sidebar')
-
         <div class="page-wrapper">
             @include('layouts.tabler-admin.header')
             <div class="page-body">
@@ -52,8 +50,6 @@
                     @yield('content')
                 </div>
             </div>
-
-
             @include('layouts.tabler-admin.footer')
         </div>
     </div>

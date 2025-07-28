@@ -4,8 +4,7 @@
         <div class="col-md-12">
             <div id="respon">
                 @if (session()->has('msg'))
-                    <div class="alert {{ session('class') }} alert-dark">
-                        <button type="button" class="close" data-dismiss="alert">×</button>
+                    <div class="alert {{ session('class') }}">
                         {{ session('msg') }}
                     </div>
                 @endif
