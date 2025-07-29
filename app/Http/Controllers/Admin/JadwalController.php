@@ -22,11 +22,11 @@ class JadwalController extends Controller
         $events = [];
         $ruangan = Ruangan::all();
         if (isset($request->ruangan_id)) {
-            $appointments = Peminjaman::with(['user', 'ruangan'])->whereNotNull('ruangan_id')->where('konfirmasi', 2)->where('ruangan_id', $request->ruangan_id)->get();
+            $appointments = Peminjaman::with(['user', 'ruangan','detail_peminjaman.barang'])->whereIn('status_peminjaman', ['disetujui','aktif','dikembalikan'])->where('ruangan_id', $request->ruangan_id)->get();
 
             $ruangan_id = $request->ruangan_id;
         } else {
-            $appointments = Peminjaman::with(['user', 'ruangan'])->whereNotNull('ruangan_id')->where('konfirmasi', 2)->get();
+            $appointments = Peminjaman::with(['user', 'ruangan','detail_peminjaman.barang'])->whereIn('status_peminjaman', ['disetujui','aktif','dikembalikan'])->get();
             $ruangan_id = null;
         }
         
@@ -44,8 +44,9 @@ class JadwalController extends Controller
                 'start' => $startIso,
                 'end' => $endIso,
                 'extendedProps' => [
-                    'ruangan' => $appointment->ruangan->nama_ruangan,
+                    'ruangan' => $appointment->ruangan->nama_ruangan ?? null,
                     'mahasiswa' => $appointment->user->name,
+                    'detail' => $appointment->detail_peminjaman ?? null,
                 ],
             ];
         }

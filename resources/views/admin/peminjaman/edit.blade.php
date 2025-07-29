@@ -17,7 +17,8 @@
 
         <div class="card">
             <div class="card-body">
-                <a class="btn btn-primary btn-sm mb-2" href="{{ route('admin.booking.index') }}"><i class="fa fa-arrow-left me-1"></i>
+                <a class="btn btn-primary btn-sm mb-2" href="{{ route('admin.booking.index') }}"><i
+                        class="fa fa-arrow-left me-1"></i>
                     Kembali</a>
                 <div class="card mb-2">
 
@@ -36,8 +37,8 @@
                                     <fieldset class="form-group">
                                         <label for="waktu_peminjaman" class="form-label">Waktu Peminjaman</label>
                                         <input type="datetime-local" name="waktu_peminjaman" id="waktu_peminjaman"
-                                            class="form-control form-control-sm" placeholder="Pilih tanggal dan jam" required
-                                            value="{{ old('waktu_peminjaman', $peminjaman->waktu_peminjaman) }}">
+                                            class="form-control form-control-sm" placeholder="Pilih tanggal dan jam"
+                                            required value="{{ old('waktu_peminjaman', $peminjaman->waktu_peminjaman) }}">
                                     </fieldset>
                                 </div>
 
@@ -71,8 +72,8 @@
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="prodi" class="form-label">Program Studi</label>
-                                        <input type="text" name="prodi" id="prodi" class="form-control form-control-sm" required
-                                            value="" disabled>
+                                        <input type="text" name="prodi" id="prodi"
+                                            class="form-control form-control-sm" required value="" disabled>
                                     </fieldset>
                                 </div>
 
@@ -103,8 +104,8 @@
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="username" class="form-label">NPM</label>
-                                        <input type="text" name="username" id="username" class="form-control form-control-sm"
-                                            value="{{ $user->username }}" disabled>
+                                        <input type="text" name="username" id="username"
+                                            class="form-control form-control-sm" value="{{ $user->username }}" disabled>
                                     </fieldset>
                                 </div>
 
@@ -114,7 +115,8 @@
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="kegiatan" class="form-label">Kegiatan</label>
-                                        <input type="text" name="kegiatan" id="kegiatan" class="form-control form-control-sm" required
+                                        <input type="text" name="kegiatan" id="kegiatan"
+                                            class="form-control form-control-sm" required
                                             value="{{ old('kegiatan', $peminjaman->kegiatan) }}">
                                     </fieldset>
                                 </div>
@@ -220,7 +222,6 @@
                     approver.is_manual = true; // Tandai semua approver awal sebagai "manual"
                     return approver;
                 });
-                console.log(listApprover)
                 updateTabelBarang();
                 // Fungsi untuk merender tabel barang dan approver dengan data awal
                 getAndUpdateApprovers();
@@ -238,30 +239,45 @@
                     allowClear: true,
                     width: '100%'
                 });
-                
-                // Untuk isi input Prodi, NPM/Username, dan NO Telepon Secara Otomatis setelah pilih nama
-                $('#nama_id').on('change', function() {
-                    const id = $(this).val();
-                    const user_id = $('#user_id');
-                    const prodi = $('#prodi');
-                    const username = $('#username'); //Username itu dipakai untuk NPM
-                    const no_telepon = $('#no_telepon');
-                    if (!id) return;
 
+                // Untuk isi input Prodi, NPM/Username, dan NO Telepon Secara Otomatis setelah pilih nama
+                // 1. Buat fungsi yang bisa digunakan kembali untuk mengambil dan mengisi data user
+                function fetchAndFillUserData(userId) {
+                    // Jika tidak ada ID yang dipilih (misal memilih "-Pilih Peminjam-"), kosongkan input
+                    if (!userId) {
+                        $('#user_id').val('');
+                        $('#prodi').val('');
+                        $('#username').val('');
+                        $('#no_telepon').val('');
+                        return; // Hentikan eksekusi
+                    }
+                    // Lakukan panggilan AJAX untuk mendapatkan detail user
                     $.get("{{ route('get.user') }}", {
-                        user_id: id,
+                        user_id: userId,
                     }, function(res) {
-                        // console.log(res)
                         const namaProdi = res.mahasiswa ? res.mahasiswa.nama_program_studi : '';
-                        user_id.attr('value', res.id); //set value input hidden User_id
-                        prodi.attr('value', namaProdi); //set value input nama prodi
-                        username.attr('value', res.username); //set value input NPM/username
-                        no_telepon.attr('value', res.no_telepon); //set value input NO Telepon
+
+                        // Gunakan .val() untuk mengisi nilai input form
+                        $('#user_id').val(res.id);
+                        $('#prodi').val(namaProdi);
+                        $('#username').val(res.username);
+                        $('#no_telepon').val(res.no_telepon);
                     }).fail(function() {
-                        const message = "Gagal Mengecek Data User";
-                        sweetAlert(message);
+                        const message = "Gagal memuat data detail pengguna.";
+                        // Ganti dengan notifikasi pilihan Anda, misalnya sweetAlert(message);
+                        alert(message);
                     });
+                }
+                // Pasang event listener 'change' yang akan memanggil fungsi fetchAndFillUserData
+                $('#nama_id').on('change', function() {
+                    const selectedUserId = $(this).val();
+                    fetchAndFillUserData(selectedUserId);
                 });
+                // 3. Picu fungsi saat halaman pertama kali dimuat
+                const initialUserId = $('#nama_id').val();
+                if (initialUserId) {
+                    fetchAndFillUserData(initialUserId);
+                }
 
                 // 2. EVENT HANDLERS (PENANGAN AKSI PENGGUNA)
                 // Perbarui daftar approver saat ada perubahan ruangan

@@ -3,17 +3,9 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <div class="row">
         <div class="col-md-12">
-            {{-- <div id="respon">
-                @if (session()->has('msg'))
-                    <div class="alert {{ session('class') }} alert-dark">
-                        <button type="button" class="close" data-dismiss="alert">×</button>
-                        {{ session('msg') }}
-                    </div>
-                @endif
-            </div> --}}
             <div class="card">
                 <div class="card-header">
-                    <div class="card-title">Jadwal Penggunaan Ruangan</div>
+                    <div class="card-title">Jadwal Peminjaman</div>
                     <div class="card-actions">
                         <form method="get" class="row align-items-end">
                             @csrf
@@ -35,8 +27,8 @@
                                 @enderror
                             </div>
                             <div class="col-md-4 mb-0">
-                                <button type="submit" class="btn btn-primary w-100 mt-4 mt-md-0">
-                                    <i class="fa fa-filter"></i>&nbsp; Filter
+                                <button type="submit" class="btn btn-primary btn-sm w-100 mt-4 mt-md-0">
+                                    <i class="fa fa-filter me-1"></i>Filter
                                 </button>
                             </div>
                         </form>
@@ -62,6 +54,11 @@
                             <p><strong>Ruangan:</strong> <span id="ruangan"></span></p>
                             <p><strong>Mulai:</strong> <span id="eventStart"></span></p>
                             <p><strong>Selesai:</strong> <span id="eventEnd"></span></p>
+                            <div>
+                                <strong>Barang:</strong>
+                                <ul id="daftar-barang" style="margin-top: 5px; padding-left: 20px;">
+                                </ul>
+                            </div>
                         </div>
                     </div>
                     <div class="modal-footer">
@@ -110,14 +107,42 @@
                         'Tidak ada';
                     let endDate = event.end ? event.end.toLocaleString('id-ID', options) : 'Tidak ada';
 
+                    // if (event.extendedProps.detail) {
+                    //     const details = event.extendedProps.detail
+                    // }
                     // Memasukkan data event ke dalam elemen modal
                     document.getElementById('modalTitle').innerText = event.title;
                     document.getElementById('eventStart').innerText = startDate;
                     document.getElementById('eventEnd').innerText = endDate;
 
                     // Untuk data custom, gunakan 'extendedProps'
-                    document.getElementById('ruangan').innerText = event.extendedProps.ruangan;
+                    document.getElementById('ruangan').innerText = event.extendedProps.ruangan != null ?
+                        event.extendedProps.ruangan : '-';
                     document.getElementById('nama').innerText = event.extendedProps.mahasiswa;
+                    // document.getElementById('barang').innerText = event.extendedProps.mahasiswa;
+                    if (event.extendedProps.detail) {
+                        const details = event.extendedProps.detail;
+                        const listContainer = document.getElementById(
+                        'daftar-barang'); // Target elemen <ul>
+
+                        // Kosongkan daftar sebelumnya untuk menghindari duplikasi
+                        listContainer.innerHTML = '';
+
+                        if (details.length > 0) {
+                            // 1. Buat string HTML untuk setiap item dalam format <li>...</li>
+                            const listItemsHTML = details.map(detail => {
+                                const namaBarang = detail.barang ? detail.barang.nama :
+                                    'Nama tidak diketahui';
+                                return `<li>${namaBarang} (${detail.jml_barang})</li>`;
+                            }).join(''); // 2. Gabungkan semua string <li> menjadi satu blok HTML
+
+                            // 3. Masukkan blok HTML ke dalam <ul>
+                            listContainer.innerHTML = listItemsHTML;
+                        } else {
+                            // Jika tidak ada barang, tampilkan placeholder dalam format list
+                            listContainer.innerText = '-';
+                        }
+                    }
 
                     // Menampilkan modal
                     var myModal = new bootstrap.Modal(document.getElementById('detailJadwal'), {
@@ -149,7 +174,7 @@
     <script>
         $(document).ready(function() {
             $('#ruangan_id').select2({
-                
+
             });
         });
     </script>
