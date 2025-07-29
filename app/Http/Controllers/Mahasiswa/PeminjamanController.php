@@ -401,11 +401,11 @@ class PeminjamanController extends Controller
 
             DB::commit();
 
-            return redirect()->route('mahasiswa.peminjaman.index')->with('msg', 'Berhasil memperbarui pengajuan.');
+            return redirect()->route('mahasiswa.peminjaman.index')->with(['msg' => 'Berhasil Mengubah Peminjaman', 'class' => 'alert-success']);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Gagal memperbarui peminjaman: ' . $e->getMessage());
-            return back()->with('msg', 'Terjadi kesalahan. Gagal memperbarui pengajuan.')->withInput();
+            return back()->with(['msg' => 'Terjadi Kesalahan, Mengubah Peminjaman', 'class' => 'alert-danger'])->withInput();
         }
     }
 

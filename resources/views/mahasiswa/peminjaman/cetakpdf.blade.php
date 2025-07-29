@@ -128,7 +128,7 @@
                     <img src="{{ asset('img/Tekno.png') }}" class="header-logo" alt="Logo">
                 </td>
                 <td class="header-kop" style="width: 70%;">
-                    <div style="font-size: 14pt; font-weight:bold;">FORMULIR</div>
+                    {{-- <div style="font-size: 14pt; font-weight:bold;">FORMULIR</div> --}}
                     <div style="font-size: 16pt; font-weight:bold;">PEMINJAMAN RUANGAN & PERALATAN</div>
                 </td>
                 <td style="width: 15%;">
@@ -154,7 +154,9 @@
                         </tr>
                         <tr>
                             <td>Selesai</td>
-                            <td>: {{ \Carbon\Carbon::parse($dataPeminjaman->waktu_pengembalian)->isoFormat(' D MMMM YYYY HH:mm') }}</td>
+                            <td>:
+                                {{ \Carbon\Carbon::parse($dataPeminjaman->waktu_pengembalian)->isoFormat(' D MMMM YYYY HH:mm') }}
+                            </td>
                         </tr>
                         <tr>
                             <td>Ruangan</td>
@@ -170,11 +172,11 @@
                     <table>
                         <tr>
                             <td style="width: 180px;">Nama Pengguna Ruangan</td>
-                            <td>: {{ $dataPeminjaman->user->name }}</td>
+                            <td>: {{ Str::title($dataPeminjaman->user->name) }}</td>
                         </tr>
                         <tr>
                             <td>Prog. Studi</td>
-                            <td>: {{ $dataPeminjaman->user->prodi?->nama ?? '-' }}</td>
+                            <td>: {{ Str::title($dataPeminjaman->user->mahasiswa->nama_program_studi ?? '-') }}</td>
                         </tr>
                         <tr>
                             <td>NPM/No. Kartu Identitas</td>
@@ -215,42 +217,73 @@
                         <td></td>
                     </tr>
                 @endforeach
-               
+
             </tbody>
         </table>
 
-<table class="signature-table">
-    <tr>
-        {{-- Loop untuk setiap BAAK/Tata Usaha --}}
-        @foreach($dataPeminjaman->persetujuan_peminjaman as $persetujuan)
-            <td>
-                <div>Tata Usaha {{ $persetujuan->unit_kerja->kode ?? '' }}</div>
-                <div class="signature-cell">
-                    @if($persetujuan->status == 'disetujui' && $persetujuan?->user?->tanda_tangan)
-                        <img src="{{ asset('storage/tanda_tangan/' . $persetujuan->user->tanda_tangan) }}" alt="TTD">
-                    @endif
+        <table class="signature-table">
+            @php
+                // 1. Buat koleksi kosong untuk menampung semua penandatangan.
+                $allSignatories = collect();
 
-                    @if($persetujuan->status == 'disetujui' && $persetujuan?->user)
-                        <u>{{ $persetujuan->user->name }}</u>
-                    @else
-                        (.....................)
-                    @endif
-                </div>
-            </td>
-        @endforeach
+                // 2. Tambahkan setiap approver ke dalam koleksi.
+                foreach ($dataPeminjaman->persetujuan_peminjaman as $persetujuan) {
+                    $allSignatories->push([
+                        'type' => 'approver',
+                        'data' => $persetujuan,
+                    ]);
+                }
 
-        {{-- Sel untuk Peminjam --}}
-        <td>
-            <div>Peminjam</div>
-            <div class="signature-cell">
-                @if($dataPeminjaman->user->tanda_tangan)
-                     <img src="{{ asset('storage/tanda_tangan/' . $dataPeminjaman->user->tanda_tangan) }}" alt="TTD">
-                @endif
-                <u>{{ $dataPeminjaman->user->name }}</u>
-            </div>
-        </td>
-    </tr>
-</table>
+                // 3. Tambahkan peminjam ke akhir koleksi.
+                $allSignatories->push([
+                    'type' => 'borrower',
+                    'data' => $dataPeminjaman->user,
+                ]);
+
+                // 4. Bagi koleksi menjadi beberapa bagian (chunks), masing-masing berisi 3 item.
+                $signatoryRows = $allSignatories->chunk(3);
+            @endphp
+
+            {{-- Loop untuk setiap baris (hasil dari chunk) --}}
+            @foreach ($signatoryRows as $row)
+                <tr>
+                    {{-- Loop untuk setiap orang di dalam baris tersebut --}}
+                    @foreach ($row as $signatory)
+                        <td>
+                            {{-- Tampilkan Jabatan/Peran --}}
+                            @if ($signatory['type'] == 'approver')
+                                <div>Tata Usaha {{ $signatory['data']->unit_kerja->kode ?? '' }}</div>
+                            @else
+                                <div>Peminjam</div>
+                            @endif
+
+                            {{-- Tampilkan Ruang TTD dan Nama --}}
+                            <div class="signature-cell">
+                                @if ($signatory['type'] == 'approver')
+                                    @if ($signatory['data']->status == 'disetujui' && $signatory['data']?->user?->tanda_tangan)
+                                        <img src="{{ asset('storage/tanda_tangan/' . $signatory['data']->user->tanda_tangan) }}"
+                                            alt="TTD">
+                                    @endif
+
+                                    @if ($signatory['data']->status == 'disetujui' && $signatory['data']?->user)
+                                        <u>{{ Str::title($signatory['data']->user->name) }}</u>
+                                    @else
+                                        (.....................)
+                                    @endif
+                                @else
+                                    {{-- Logika untuk Peminjam --}}
+                                    @if ($signatory['data']->tanda_tangan)
+                                        <img src="{{ asset('storage/tanda_tangan/' . $signatory['data']->tanda_tangan) }}"
+                                            alt="TTD">
+                                    @endif
+                                    <u>{{ Str::title($signatory['data']->name) }}</u>
+                                @endif
+                            </div>
+                        </td>
+                    @endforeach
+                </tr>
+            @endforeach
+        </table>
 
     </div>
 

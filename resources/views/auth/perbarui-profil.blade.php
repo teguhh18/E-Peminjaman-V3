@@ -55,8 +55,8 @@
                                 <input type="email" class="form-control @error('email') is-invalid @enderror" name="email" value="{{ old('email', $user->email) }}">
                             </div>
                             <div class="col-md-6">
-                                <label class="form-label">No. Telepon (Format: 628...)</label>
-                                <input type="text" class="form-control @error('no_telepon') is-invalid @enderror" id="no_telepon" name="no_telepon" value="{{ old('no_telepon', $user->no_telepon) }}">
+                                <label class="form-label required">No. Telepon (Format: 628...)</label>
+                                <input type="text" class="form-control @error('no_telepon') is-invalid @enderror" id="no_telepon" name="no_telepon" value="{{ old('no_telepon', $user->no_telepon) }}" required>
                             </div>
                         </div>
 
@@ -77,7 +77,7 @@
 
                             {{-- Preview Tanda Tangan --}}
                             <div class="col-md-6">
-                                <div class="form-label">Tanda Tangan</div>
+                                <div class="form-label required">Tanda Tangan</div>
                                 <div class="mb-3 p-2 border rounded" style="background-color: #f8f9fa;">
                                     <img src="{{ $user->tanda_tangan ? asset('storage/tanda_tangan/' . $user->tanda_tangan) : 'https://placehold.co/300x150?text=No+Image' }}" 
                                          alt="Preview Tanda Tangan" class="tanda-tangan-preview img-fluid mb-2 d-block mx-auto" style="max-height: 80px;">

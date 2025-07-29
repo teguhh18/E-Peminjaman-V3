@@ -83,7 +83,7 @@ class PengembalianController extends Controller
         }
         // Jika status "bermasalah",BELUM
 
-        return back()->with('success', 'Status ruangan berhasil diperbarui.');
+        return back()->with(['msg' => 'Berhasil Memperbarui Status Ruangan', 'class' => 'alert-success']);
     }
 
     /**
@@ -143,7 +143,7 @@ class PengembalianController extends Controller
         // Tidak ada aksi khusus yang perlu dilakukan pada status peminjaman utama.
         // Peminjaman akan tetap aktif sampai masalah diselesaikan dan status diubah menjadi "dikembalikan".
 
-        return back()->with('success', 'Status barang berhasil diperbarui.');
+        return back()->with(['msg' => 'Berhasil Memperbarui Status Barang', 'class' => 'alert-success']);
     }
 
 
