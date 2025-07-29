@@ -8,8 +8,8 @@
                     <div class="card-title">Data Gedung</div>
                     <div class="card-actions">
 
-                        <a href="{{ route('admin.gedung.create') }}" class="btn btn-xs btn-primary btn-add">
-                            <i class="fa fa-plus"></i>&nbsp; Tambah Data
+                        <a href="{{ route('admin.gedung.create') }}" class="btn btn-sm btn-primary btn-add">
+                            <i class="fa fa-plus me-1"></i>Tambah Data
                         </a>
                     </div>
                 </div>

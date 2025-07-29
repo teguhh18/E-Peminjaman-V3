@@ -16,7 +16,7 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-actions">
-                        <a href="{{ route('admin.barang.index') }}" class="btn btn-md btn-warning btn-add">
+                        <a href="{{ route('admin.barang.index') }}" class="btn btn-sm btn-warning btn-add">
                             <i class="fa fa-arrow-left"></i>&nbsp; kembali
                         </a>
                     </div>
@@ -218,7 +218,7 @@
 
                     </div>
                     <div class="card-footer">
-                        <button type="submit" class="btn btn-primary">
+                        <button type="submit" class="btn btn-primary btn-sm">
                             <i class="fa fa-save"></i>&nbsp; Simpan
                         </button>
                     </div>

@@ -17,8 +17,8 @@
 
         <div class="card">
             <div class="card-body">
-                <a class="btn btn-primary mb-2" href="{{ route('mahasiswa.peminjaman.index') }}"><i
-                        class="fa fa-arrow-left"></i> Kembali</a>
+                <a class="btn btn-primary btn-sm mb-2" href="{{ route('mahasiswa.peminjaman.index') }}"><i
+                        class="fa fa-arrow-left me-1"></i> Kembali</a>
                 <div class="card mb-2">
 
                 </div>
@@ -36,7 +36,7 @@
                                     <fieldset class="form-group">
                                         <label for="waktu_peminjaman" class="form-label">Waktu Peminjaman</label>
                                         <input type="datetime-local" name="waktu_peminjaman" id="waktu_peminjaman"
-                                            class="form-control" placeholder="Pilih tanggal dan jam" required
+                                            class="form-control form-control-sm" placeholder="Pilih tanggal dan jam" required
                                             value="{{ old('waktu_peminjaman', $peminjaman->waktu_peminjaman) }}">
                                     </fieldset>
                                 </div>
@@ -44,7 +44,7 @@
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="name" class="form-label">Nama</label>
-                                        <input type="text" name="name" id="name" class="form-control" disabled
+                                        <input type="text" name="name" id="name" class="form-control form-control-sm" disabled
                                             value="{{ old('name', $user->name) }}">
                                     </fieldset>
                                 </div>
@@ -55,7 +55,7 @@
                                     <fieldset class="form-group">
                                         <label for="waktu_pengembalian" class="form-label">Sampai Dengan</label>
                                         <input type="datetime-local" name="waktu_pengembalian" id="waktu_pengembalian"
-                                            class="form-control" required
+                                            class="form-control form-control-sm" required
                                             value="{{ old('waktu_pengembalian', $peminjaman->waktu_pengembalian) }}">
                                     </fieldset>
                                 </div>
@@ -63,7 +63,7 @@
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="prodi" class="form-label">Program Studi</label>
-                                        <input type="text" name="prodi" id="prodi" class="form-control" required
+                                        <input type="text" name="prodi" id="prodi" class="form-control form-control-sm" required
                                             value="" disabled>
                                     </fieldset>
                                 </div>
@@ -72,11 +72,11 @@
 
                             <div class="row mt-2">
                                 <div class="col-md-6">
-                                    <label for="ruangan" class="form-label">Pilih Ruangan</label>
-                                    <small class="text-danger">Kosongkan Jika hanya ingin pinjam barang
-                                        saja</small>
+                                    <label for="ruangan" class="form-label">Pilih Ruangan <small class="text-danger">*Kosongkan Jika hanya ingin pinjam barang
+                                        saja</small></label>
+                                    
                                     <select name="ruangan_id" id="ruangan_id"
-                                        class="form-control @error('ruangan_id') is-invalid @enderror">
+                                        class="form-control form-control-sm @error('ruangan_id') is-invalid @enderror">
                                         <option value="">-Pilih Ruangan-</option>
                                         @foreach ($dataRuangan as $ruangan)
                                             <option value="{{ $ruangan->id }}"
@@ -95,7 +95,7 @@
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="username" class="form-label">NPM</label>
-                                        <input type="text" name="username" id="username" class="form-control"
+                                        <input type="text" name="username" id="username" class="form-control form-control-sm"
                                             value="{{ $user->username }}" disabled>
                                     </fieldset>
                                 </div>
@@ -106,7 +106,7 @@
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="kegiatan" class="form-label">Kegiatan</label>
-                                        <input type="text" name="kegiatan" id="kegiatan" class="form-control" required
+                                        <input type="text" name="kegiatan" id="kegiatan" class="form-control form-control-sm" required
                                             value="{{ old('kegiatan', $peminjaman->kegiatan) }}">
                                     </fieldset>
                                 </div>
@@ -114,14 +114,14 @@
                                     <fieldset class="form-group">
                                         <label for="no_telepon" class="form-label">No Telepon</label>
                                         <input type="text" name="no_telepon" id="no_telepon"
-                                            class="form-control numbers-only" required
+                                            class="form-control form-control-sm numbers-only" required
                                             value="{{ $user->no_telepon ?? '' }}">
                                     </fieldset>
                                 </div>
                             </div>
 
                             <!-- Tombol untuk memunculkan modal -->
-                            <button type="button" class="btn btn-primary mt-3 mb-1" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-primary btn-sm mt-3 mb-1" data-bs-toggle="modal"
                                 data-bs-target="#modalTambahBarang" id="btnTambahBarang">
                                 Tambah Barang
                             </button>
@@ -159,7 +159,7 @@
                                 </tbody>
                             </table>
 
-                            <button type="submit" href="" class="btn btn-primary mt-2">
+                            <button type="submit" href="" class="btn btn-primary btn-sm mt-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round"
@@ -224,10 +224,11 @@
                 });
 
                 // Inisialisasi Select2 untuk elemen yang sudah ada di halaman
-                $('#ruangan_id, #nama_id').select2({
+                $('#ruangan_id').select2({
                     placeholder: 'Pilih',
-                    theme: 'bootstrap-5',
-                    allowClear: true
+                    // theme: 'bootstrap-5',
+                    allowClear: true,
+                    with: '100%'
                 });
 
                 // 2. EVENT HANDLERS (PENANGAN AKSI PENGGUNA)
@@ -400,17 +401,6 @@
                 }
 
                 let manuallyRemovedApprovers = [];
-                // fungsi hapus approver
-                window.hapusApprover = function(id) {
-                    const approverId = parseInt(id);
-                    // Catat ID yang dihapus ke "daftar hitam" agar tidak disarankan lagi
-                    if (!manuallyRemovedApprovers.includes(approverId)) {
-                        manuallyRemovedApprovers.push(approverId);
-                    }
-                    // Hapus dari daftar utama
-                    listApprover = listApprover.filter(item => parseInt(item.id) !== approverId);
-                    renderTabelApprover();
-                }
 
                 function getAndUpdateApprovers() {
                     const ruanganId = $('#ruangan_id').val();
@@ -452,9 +442,6 @@
                             <td>
                                 ${item.nama}
                                 <input type="hidden" name="approver_id[]" value="${item.id}">
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-danger btn-sm" onclick="hapusApprover(${item.id})">Hapus</button>
                             </td>
                         </tr>`;
                     });

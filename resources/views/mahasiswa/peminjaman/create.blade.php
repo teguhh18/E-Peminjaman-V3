@@ -17,7 +17,7 @@
 
         <div class="card">
             <div class="card-body">
-                <a class="btn btn-outline-secondary mb-2" href="{{ route('home') }}">
+                <a class="btn btn-outline-secondary btn-sm mb-2" href="{{ route('home') }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
                         class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left">
@@ -44,7 +44,7 @@
                                     <fieldset class="form-group">
                                         <label for="waktu_peminjaman" class="form-label">Waktu Peminjaman</label>
                                         <input type="datetime-local" name="waktu_peminjaman" id="waktu_peminjaman"
-                                            class="form-control" placeholder="Pilih tanggal dan jam" required
+                                            class="form-control form-control-sm" placeholder="Pilih tanggal dan jam" required
                                             value="{{ old('waktu_peminjaman') }}">
                                     </fieldset>
                                 </div>
@@ -52,7 +52,7 @@
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="name" class="form-label">Nama</label>
-                                        <input type="text" name="name" id="name" class="form-control"
+                                        <input type="text" name="name" id="name" class="form-control form-control-sm"
                                             value="{{ $user->name }}" disabled>
                                     </fieldset>
                                 </div>
@@ -63,15 +63,15 @@
                                     <fieldset class="form-group">
                                         <label for="waktu_pengembalian" class="form-label">Sampai Dengan</label>
                                         <input type="datetime-local" name="waktu_pengembalian" id="waktu_pengembalian"
-                                            class="form-control" required value="{{ old('waktu_pengembalian') }}">
+                                            class="form-control form-control-sm" required value="{{ old('waktu_pengembalian') }}">
                                     </fieldset>
                                 </div>
 
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="prodi" class="form-label">Program Studi</label>
-                                        <input type="text" name="prodi" id="prodi" class="form-control" required
-                                            value="" disabled>
+                                        <input type="text" name="prodi" id="prodi" class="form-control form-control-sm" required
+                                            value="{{ $user->mahasiswa->nama_program_studi }}" disabled>
                                     </fieldset>
                                 </div>
 
@@ -102,7 +102,7 @@
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="username" class="form-label">NPM</label>
-                                        <input type="text" name="username" id="username" class="form-control"
+                                        <input type="text" name="username" id="username" class="form-control form-control-sm"
                                             value="{{ $user->username }}" disabled>
                                     </fieldset>
                                 </div>
@@ -113,7 +113,7 @@
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="kegiatan" class="form-label">Kegiatan</label>
-                                        <input type="text" name="kegiatan" id="kegiatan" class="form-control" required
+                                        <input type="text" name="kegiatan" id="kegiatan" class="form-control form-control-sm" required
                                             value="{{ old('kegiatan') }}">
                                     </fieldset>
                                 </div>
@@ -121,14 +121,14 @@
                                     <fieldset class="form-group">
                                         <label for="no_telepon" class="form-label ">No Telepon</label>
                                         <input type="text" name="no_telepon" id="no_telepon"
-                                            class="form-control numbers-only" required
+                                            class="form-control form-control-sm numbers-only" required
                                             value="{{ $user->no_telepon ?? '' }}">
                                     </fieldset>
                                 </div>
                             </div>
 
                             <!-- Tombol untuk memunculkan modal -->
-                            <button type="button" class="btn btn-outline-azure mt-3 mb-1" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-outline-azure btn-sm mt-3 mb-1" data-bs-toggle="modal"
                                 data-bs-target="#modalTambahBarang" id="btnTambahBarang">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -182,7 +182,7 @@
                                 </tbody>
                             </table>
 
-                            <button type="submit" href="" class="btn btn-azure mt-2">
+                            <button type="submit" href="" class="btn btn-azure btn-sm mt-2">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
                                     viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
                                     stroke-linecap="round" stroke-linejoin="round"
@@ -232,7 +232,8 @@
                 $('#ruangan_id').select2({
                     placeholder: 'Pilih Ruangan',
                     allowClear: true,
-                    theme: 'bootstrap-5'
+                    // theme: 'bootstrap-5',
+                    width: '100%',
                 });
             });
         </script>

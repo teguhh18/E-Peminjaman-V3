@@ -21,8 +21,9 @@
             <div class="card-header">
                 <div class="card-title">Data Riwayat Peminjaman</div>
                 <div class="card-actions">
-                    <a href="{{ route('admin.laporan') }}" class="btn btn-primary"> <i class="fa fa-print"></i>
-                        &nbsp; Print Laporan</a>
+                    <a href="{{ route('admin.laporan') }}" class="btn btn-primary btn-sm"> <i class="fa fa-print me-1"></i>
+                    Print Laporan
+                    </a>
 
                 </div>
             </div>

@@ -15,7 +15,7 @@
                     </h3>
                     <div class="card-actions">
 
-                        <a href="{{ route('mahasiswa.peminjaman.create') }}" class="btn btn-teal">
+                        <a href="{{ route('mahasiswa.peminjaman.create') }}" class="btn btn-sm btn-teal">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-apps" width="44"
                                 height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#ffffff" fill="none"
                                 stroke-linecap="round" stroke-linejoin="round">

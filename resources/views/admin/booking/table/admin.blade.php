@@ -18,20 +18,20 @@
                     <td class="center">{{ $loop->iteration }}</td>
                     <td>
                         {{-- Tombol Whatsapp --}}
-                        <a style="margin-top: 5px;"
+                        <a
                             href="https://api.whatsapp.com/send?phone={{ $booking->no_peminjam }}&text=Pesan"
                             target="_blank" class="btn btn-sm btn-success">
-                            <i class="fa fa-comment"></i> &nbsp; WhatsApp
+                            <i class="fa fa-comment me-1"></i> WhatsApp
                         </a>
 
-                        <a style="margin-top: 5px;" href="{{ route('admin.peminjaman.edit', encrypt($booking->id)) }}"
-                            class="btn btn-sm btn-warning">
-                            <i class="fa fa-edit"></i> &nbsp; Edit
+                        <a href="{{ route('admin.peminjaman.edit', encrypt($booking->id)) }}"
+                            class="btn btn-sm btn-warning mt-1">
+                            <i class="fa fa-edit me-1"></i> Edit
                         </a>
 
-                        <span style="margin-top: 5px;" id="btn-delete" data-id="{{ $booking->id }}"
-                            class="btn btn-sm btn-danger">
-                            <i class="fa fa-trash"></i> &nbsp; Hapus
+                        <span id="btn-delete" data-id="{{ $booking->id }}"
+                            class="btn btn-sm btn-danger mt-1">
+                            <i class="fa fa-trash me-1"></i> Hapus
                         </span>
                     </td>
                     <td class="center">

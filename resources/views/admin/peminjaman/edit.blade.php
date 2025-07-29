@@ -220,6 +220,7 @@
                     approver.is_manual = true; // Tandai semua approver awal sebagai "manual"
                     return approver;
                 });
+                console.log(listApprover)
                 updateTabelBarang();
                 // Fungsi untuk merender tabel barang dan approver dengan data awal
                 getAndUpdateApprovers();
@@ -235,6 +236,30 @@
                     placeholder: 'Pilih',
                     theme: 'bootstrap-5',
                     allowClear: true
+                });
+                
+                // Untuk isi input Prodi, NPM/Username, dan NO Telepon Secara Otomatis setelah pilih nama
+                $('#nama_id').on('change', function() {
+                    const id = $(this).val();
+                    const user_id = $('#user_id');
+                    const prodi = $('#prodi');
+                    const username = $('#username'); //Username itu dipakai untuk NPM
+                    const no_telepon = $('#no_telepon');
+                    if (!id) return;
+
+                    $.get("{{ route('get.user') }}", {
+                        user_id: id,
+                    }, function(res) {
+                        // console.log(res)
+                        const namaProdi = res.mahasiswa ? res.mahasiswa.nama_program_studi : '';
+                        user_id.attr('value', res.id); //set value input hidden User_id
+                        prodi.attr('value', namaProdi); //set value input nama prodi
+                        username.attr('value', res.username); //set value input NPM/username
+                        no_telepon.attr('value', res.no_telepon); //set value input NO Telepon
+                    }).fail(function() {
+                        const message = "Gagal Mengecek Data User";
+                        sweetAlert(message);
+                    });
                 });
 
                 // 2. EVENT HANDLERS (PENANGAN AKSI PENGGUNA)
@@ -472,7 +497,7 @@
                         barang_id: barangIds,
                     }).done(function(res) {
                         const suggestions = res.approvers;
-
+                        console.log(suggestions)
                         // 1. Hapus saran sistem yang lama, TAPI pertahankan yang ditambah manual
                         listApprover = listApprover.filter(approver => approver.is_manual === true);
 

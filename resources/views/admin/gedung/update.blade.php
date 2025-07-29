@@ -9,8 +9,8 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-actions">
-                        <a href="{{ route('admin.gedung.index') }}" class="btn btn-xs btn-warning btn-add">
-                            <i class="fa fa-arrow-left"></i> kembali
+                        <a href="{{ route('admin.gedung.index') }}" class="btn btn-sm btn-warning btn-add">
+                            <i class="fa fa-arrow-left me-1"></i> kembali
                         </a>
                     </div>
                 </div>
@@ -121,7 +121,7 @@
 
                     </div>
                     <div class="card-footer">
-                        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Simpan</button>
+                        <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-save me-1"></i> Simpan</button>
                     </div>
                 </form>
 

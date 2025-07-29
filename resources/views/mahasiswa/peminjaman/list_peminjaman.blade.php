@@ -21,22 +21,16 @@
                         <div><b> Kegiatan :</b> {{ $peminjaman->kegiatan }}</div>
                     </td>
 
-                    <td>
+                     {{-- KOLOM WAKTU --}}
+                    <td style="min-width:100px; white-space: nowrap;" class="small">
+                        <strong class="text-success">Mulai:</strong>
                         <div>
-                            <strong class="text-success">
-                                Mulai:
-                            </strong>
-                            <span>
-                                {{ \Carbon\Carbon::parse($peminjaman->waktu_peminjaman)->isoFormat(' D MMMM YYYY HH:mm') }}
-                            </span>
+                            {{ \Carbon\Carbon::parse($peminjaman->waktu_peminjaman)->isoFormat('D MMM Y, hh:mm') }}
                         </div>
+
+                        <strong class="text-danger mt-2">Selesai:</strong>
                         <div>
-                            <strong class="text-danger">
-                                Selesai:
-                            </strong>
-                            <span>
-                                {{ \Carbon\Carbon::parse($peminjaman->waktu_pengembalian)->isoFormat(' D MMMM YYYY HH:mm') }}
-                            </span>
+                            {{ \Carbon\Carbon::parse($peminjaman->waktu_pengembalian)->isoFormat('D MMM Y, hh:mm') }}
                         </div>
                     </td>
                     <td>
@@ -48,7 +42,7 @@
                             {{-- Tampilkan status kunci jika relevan --}}
                             @if (in_array($peminjaman->status_peminjaman, ['disetujui', 'aktif', 'selesai']))
                                 <span class="badge bg-blue-lt">
-                                    Status Kunci:
+                                    Status :
                                     {{ Str::title(str_replace('_', ' ', $peminjaman->status_ruangan ?? 'Disetujui')) }}
                                 </span>
                             @endif
@@ -58,10 +52,10 @@
                         @if (!$peminjaman->detail_peminjaman->isEmpty())
                             <div class="{{ $peminjaman->ruangan ? 'mt-2' : '' }}">
                                 <strong>Barang:</strong>
-                                <button class="btn btn-sm btn-info btn-detail rounded"
+                                <span class="btn btn-info btn-sm btn-detail"
                                     data-id="{{ $peminjaman->id }}">
                                     <i class="fa fa-eye me-1"></i>Detail Barang
-                                </button>
+                                </span>
                             </div>
                         @endif
 
@@ -158,7 +152,7 @@
                         @if ($peminjaman->status_peminjaman == 'menunggu')
                             <a href="{{ route('mahasiswa.peminjaman.edit', encrypt($peminjaman->id)) }}"
                                 class="badge bg-green text-green-fg btn btn-edit" data-id="{{ $peminjaman->id }}"><i
-                                    class="fas fa-edit"></i>
+                                    class="fas fa-edit me-1"></i>
                                 Edit</a>
                             <form action="{{ route('mahasiswa.peminjaman.destroy', $peminjaman->id) }}" method="post"
                                 id="deleteForm" style="display: inline-block">
@@ -167,14 +161,13 @@
                                 <button type="submit" onclick="confirmDelete(event)"
                                     class="badge bg-red text-red-fg mt-2"><i class="fa fa-times"></i>
                                     hapus</button>
-
                             </form>
                         @endif
 
                         @if (in_array($peminjaman->status_peminjaman, ['disetujui', 'aktif', 'selesai']))
                             <a href="{{ route('mahasiswa.peminjaman.cetak', encrypt($peminjaman->id)) }}"
                                 target="__blank" class="badge bg-yellow text-yellow-fg btn btn-add"
-                                data-id="{{ $peminjaman->id }}"><i class="fa fa-print"></i>
+                                data-id="{{ $peminjaman->id }}"><i class="fa fa-print me-1"></i>
                                 Cetak</a>
                         @endif
 </div>

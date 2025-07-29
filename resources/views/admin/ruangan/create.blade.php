@@ -8,7 +8,7 @@
             <div class="card">
                 <div class="card-header">
                     <div class="card-actions">
-                        <a href="{{ route('admin.ruangan.index') }}" class="btn btn-md btn-warning btn-add">
+                        <a href="{{ route('admin.ruangan.index') }}" class="btn btn-sm btn-warning btn-add">
                             <i class="fa fa-arrow-left"></i>&nbsp; kembali
                         </a>
                     </div>
@@ -179,7 +179,7 @@
 
                         <div class="row">
                             <div class="col-md-4">
-                                <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Simpan</button>
+                                <button type="submit" class="btn btn-sm btn-primary"><i class="fa fa-save"></i> Simpan</button>
                             </div>
                         </div>
                 </form>

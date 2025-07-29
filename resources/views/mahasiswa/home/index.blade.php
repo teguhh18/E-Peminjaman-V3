@@ -16,7 +16,7 @@
                     <div class="card-title">List Peminjaman</div>
 
                     <div class="card-actions d-flex justify-content-end align-items-end gap-2 flex-wrap">
-                        <a href="{{ route('mahasiswa.peminjaman.create') }}" class="btn btn-teal">
+                        <a href="{{ route('mahasiswa.peminjaman.create') }}" class="btn btn-sm btn-teal">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round"
@@ -26,9 +26,7 @@
                             </svg>
                             Buat Peminjaman
                         </a>
-
-
-                        <a href="{{ route('mahasiswa.peminjaman.index') }}" class="btn btn-warning">
+                        <a href="{{ route('mahasiswa.peminjaman.index') }}" class="btn btn-sm btn-warning">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
                                 fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
                                 stroke-linejoin="round" class="icon icon-tabler icons-tabler-outline icon-tabler-history">
@@ -38,7 +36,6 @@
                             </svg>
                             Riwayat Peminjaman
                         </a>
-
                     </div>
                 </div>
 

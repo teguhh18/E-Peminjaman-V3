@@ -8,9 +8,9 @@
 @extends($layout)
 
 @section('content')
-<div class="page-header">
+<div class="page-header ">
     <div class="container">
-        <h1 class="page-title">Perbarui Profil Anda</h1>
+        <h1 class="text-center">Perbarui Profil Anda</h1>
     </div>
 </div>
 
@@ -68,7 +68,7 @@
                             <div class="col-md-6">
                                 <div class="form-label">Foto Profil</div>
                                 <div class="mb-3 p-2">
-                                    <img src="{{ $user->foto ? asset('storage/users/' . $user->foto) : 'https://via.placeholder.com/300' }}" 
+                                    <img src="{{ $user->foto ? asset('storage/users/' . $user->foto) : 'https://placehold.co/300x300?text=No+Image' }}" 
                                          alt="Preview Foto" class="img-preview avatar avatar-xl mb-2 rounded">
                                 </div>
                                 <input type="file" class="form-control" name="foto" id="foto" accept="image/*">
@@ -79,7 +79,7 @@
                             <div class="col-md-6">
                                 <div class="form-label">Tanda Tangan</div>
                                 <div class="mb-3 p-2 border rounded" style="background-color: #f8f9fa;">
-                                    <img src="{{ $user->tanda_tangan ? asset('storage/tanda_tangan/' . $user->tanda_tangan) : 'https://via.placeholder.com/300x150' }}" 
+                                    <img src="{{ $user->tanda_tangan ? asset('storage/tanda_tangan/' . $user->tanda_tangan) : 'https://placehold.co/300x150?text=No+Image' }}" 
                                          alt="Preview Tanda Tangan" class="tanda-tangan-preview img-fluid mb-2 d-block mx-auto" style="max-height: 80px;">
                                 </div>
                                 <input type="file" class="form-control" name="tanda_tangan" id="tanda_tangan" accept="image/*">
@@ -89,8 +89,8 @@
                     </div>
 
                     <div class="card-footer text-end">
-                        <a href="{{ route('home.index') }}" class="btn">Kembali</a>
-                        <button type="submit" class="btn btn-warning"><i class="ti ti-device-floppy me-1"></i> Update Profil</button>
+                        <a href="{{ route('home.index') }}" class="btn btn-sm">Kembali</a>
+                        <button type="submit" class="btn btn-sm btn-warning"><i class="fa fa-pencil me-1"></i> Update Profil</button>
                     </div>
                 </form>
             </div>

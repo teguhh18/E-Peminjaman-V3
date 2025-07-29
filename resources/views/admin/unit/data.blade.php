@@ -6,8 +6,8 @@
                 <div class="card-header">
                     <div class="card-title">Data Unit Kerja</div>
                     <div class="card-actions">
-                        <a href="{{ route('admin.unit.create') }}" class="btn btn-md btn-primary btn-add">
-                            <i class="fa fa-plus"></i>&nbsp; Tambah Data
+                        <a href="{{ route('admin.unit.create') }}" class="btn btn-sm btn-primary btn-add">
+                            <i class="fa fa-plus me-1"></i>Tambah Data
                         </a>
                     </div>
                 </div>
@@ -47,7 +47,6 @@
 
             $(document).on("click", ".btn-delete", function() {
                 var id = $(this).attr("data-id");
-                // console.log(id);
                 var url = "{{ route('admin.unit.show', ':id_data') }}";
                 url = url.replace(":id_data", id);
                 $.ajax({

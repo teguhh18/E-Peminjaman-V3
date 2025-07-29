@@ -19,7 +19,7 @@
             <div class="card-body">
                 <div class="card">
                     <div class="card-header bg-primary text-blue-fg">
-                        <strong>Form Pemminjaman Ruangan & Peralatan</strong>
+                        <strong>Form Peminjaman Ruangan & Peralatan</strong>
                     </div>
                     <div class="card-body">
                         <form action="{{ route('admin.peminjaman.store') }}" method="post" id="form-peminjaman">
@@ -30,7 +30,8 @@
                                     <fieldset class="form-group">
                                         <label for="waktu_peminjaman" class="form-label">Waktu Peminjaman</label>
                                         <input type="datetime-local" name="waktu_peminjaman" id="waktu_peminjaman"
-                                            class="form-control" placeholder="Pilih tanggal dan jam" required>
+                                            class="form-control form-control-sm" placeholder="Pilih tanggal dan jam"
+                                            required>
                                     </fieldset>
                                 </div>
 
@@ -38,7 +39,7 @@
                                     <fieldset class="form-group">
                                         <label for="nama_id" class="form-label">Nama</label>
                                         <select name="nama_id" id="nama_id"
-                                            class="form-control @error('nama_id') is-invalid @enderror">
+                                            class="form-control form-control-sm @error('nama_id') is-invalid @enderror">
                                             <option value="">-Peminjam-</option>
                                             @foreach ($mahasiswa as $item)
                                                 <option value="{{ $item->id }}">{{ $item->name }}
@@ -56,15 +57,15 @@
                                     <fieldset class="form-group">
                                         <label for="waktu_pengembalian" class="form-label">Sampai Dengan</label>
                                         <input type="datetime-local" name="waktu_pengembalian" id="waktu_pengembalian"
-                                            class="form-control" required>
+                                            class="form-control form-control-sm" required>
                                     </fieldset>
                                 </div>
 
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="prodi" class="form-label">Program Studi</label>
-                                        <input type="text" name="prodi" id="prodi" class="form-control" required
-                                            disabled>
+                                        <input type="text" name="prodi" id="prodi" class="form-control form-control-sm" required
+                                            readonly>
                                     </fieldset>
                                 </div>
 
@@ -77,7 +78,7 @@
                                             saja</small></label>
 
                                     <select name="ruangan_id" id="ruangan_id"
-                                        class="form-control @error('ruangan_id') is-invalid @enderror">
+                                        class="form-control form-control-sm @error('ruangan_id') is-invalid @enderror">
                                         <option value="">-Pilih Ruangan-</option>
                                         @foreach ($dataRuangan as $ruangan)
                                             <option value="{{ $ruangan->id }}">{{ $ruangan->kode_ruangan }} -
@@ -95,7 +96,8 @@
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="username" class="form-label">NPM</label>
-                                        <input type="text" name="username" id="username" class="form-control" disabled>
+                                        <input type="text" name="username" id="username"
+                                            class="form-control form-control-sm" disabled>
                                     </fieldset>
                                 </div>
 
@@ -105,20 +107,21 @@
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="kegiatan" class="form-label">Kegiatan</label>
-                                        <input type="text" name="kegiatan" id="kegiatan" class="form-control" required>
+                                        <input type="text" name="kegiatan" id="kegiatan"
+                                            class="form-control form-control-sm" required>
                                     </fieldset>
                                 </div>
                                 <div class="col-md-6">
                                     <fieldset class="form-group">
                                         <label for="no_telepon" class="form-label">No Telepon</label>
                                         <input type="text" name="no_telepon" id="no_telepon"
-                                            class="form-control numbers-only" required>
+                                            class="form-control form-control-sm numbers-only" required>
                                     </fieldset>
                                 </div>
                             </div>
 
                             <!-- Tombol untuk memunculkan modal -->
-                            <button type="button" class="btn btn-primary mt-3 mb-1" data-bs-toggle="modal"
+                            <button type="button" class="btn btn-primary btn-sm mt-3 mb-1" data-bs-toggle="modal"
                                 data-bs-target="#modalTambahBarang" id="btnTambahBarang">
                                 Tambah Barang
                             </button>
@@ -144,7 +147,7 @@
 
                             <div class="col">
                                 <!-- Tombol untuk memunculkan pilih aprove -->
-                                <button type="button" class="btn btn-primary mt-3 mb-1" data-bs-toggle="modal"
+                                <button type="button" class="btn btn-primary btn-sm mt-3 mb-1" data-bs-toggle="modal"
                                     data-bs-target="#modalTambahBarang" id="btnPilihApprover">
                                     Pilih Approver
                                 </button>
@@ -164,8 +167,8 @@
                                 </tbody>
                             </table>
 
-                            <button type="submit" href="" class="btn btn-primary mt-2"><i
-                                    class="fa fa-save"></i>
+                            <button type="submit" href="" class="btn btn-primary btn-sm mt-2"><i
+                                    class="fa fa-save me-1"></i>
                                 Simpan</button>
                         </form>
                     </div>
@@ -175,7 +178,7 @@
         </div>
         {{-- Tempat Modal --}}
         <div id="modalContainer"></div>
-    @endsection
+@endsection
 
     @push('js')
         <script>
@@ -204,14 +207,16 @@
                 $('#ruangan_id').select2({
                     placeholder: 'Pilih Ruangan',
                     allowClear: true,
-                    theme: 'bootstrap-5'
+                    width: '100%',
+                    // theme: 'bootstrap-5'
                 });
 
                 // Select2 untuk nama peminjam
                 $('#nama_id').select2({
+                    width: '100%',
                     placeholder: 'Pilih Peminjam',
                     allowClear: true,
-                    theme: 'bootstrap-5'
+                    // theme: 'bootstrap-5',
                 });
 
                 // Untuk isi input Prodi, NPM/Username, dan NO Telepon Secara Otomatis setelah pilih nama
@@ -227,7 +232,7 @@
                         user_id: id,
                     }, function(res) {
                         // console.log(res)
-                        const namaProdi = res.prodi ? res.prodi.nama : '';
+                        const namaProdi = res.mahasiswa ? res.mahasiswa.nama_program_studi : '';
                         user_id.attr('value', res.id); //set value input hidden User_id
                         prodi.attr('value', namaProdi); //set value input nama prodi
                         username.attr('value', res.username); //set value input NPM/username

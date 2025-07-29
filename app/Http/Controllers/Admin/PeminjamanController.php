@@ -50,7 +50,7 @@ class PeminjamanController extends Controller
     public function getUser(Request $request)
     {
         // $user = User::find($request->user_id);
-        $user = User::with('prodi')->find($request->user_id);
+        $user = User::with('mahasiswa')->find($request->user_id);
         return response()->json($user);
     }
 
@@ -228,6 +228,7 @@ class PeminjamanController extends Controller
             }
         }
         $uniqueAssetUnitKerjaIds = array_unique($assetUnitKerjaIds);
+        // dd($uniqueAssetUnitKerjaIds);
 
         // 2. Filter persetujuan untuk mendapatkan approver "tambahan" (manual)
         $approvers = $peminjaman->persetujuan_peminjaman
