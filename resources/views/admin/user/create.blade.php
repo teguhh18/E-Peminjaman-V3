@@ -18,8 +18,8 @@
                 <div class="card-header">
                     <h3 class="card-title">Tambah Data</h3>
                     <div class="card-actions">
-                        <a href="{{ route('admin.user.index') }}" class="btn btn-xs btn-warning btn-add">
-                            <i class="fa fa-arrow-left"></i> Kembali
+                        <a href="{{ route('admin.user.index') }}" class="btn btn-sm btn-warning btn-add">
+                            <i class="fa fa-arrow-left me-1"></i>Kembali
                         </a>
                     </div>
                 </div>
@@ -137,7 +137,7 @@
 
                         <div class="row">
                             <div class="col-md-4">
-                                <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Simpan</button>
+                                <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-save me-1"></i> Simpan</button>
                             </div>
                         </div>
                     </form>

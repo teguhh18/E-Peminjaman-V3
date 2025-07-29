@@ -21,7 +21,7 @@
                 <div class="card-header">
                     <div class="card-title">Data User</div>
                     <div class="card-actions">
-                        <a href="{{ route('admin.user.create') }}" class="btn btn-md btn-primary btn-add">
+                        <a href="{{ route('admin.user.create') }}" class="btn btn-sm btn-primary btn-add">
                             <i class="fa fa-plus"></i>&nbsp; Tambah User
                         </a>
                     </div>

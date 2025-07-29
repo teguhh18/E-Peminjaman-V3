@@ -409,6 +409,20 @@ class PeminjamanController extends Controller
         }
     }
 
+    public function confirmDelete($id)
+    {
+        $title = "Hapus Peminjaman";
+        $peminjaman = Peminjaman::find(decrypt($id));
+        $view =  view('mahasiswa.peminjaman.delete', compact(
+            'title',
+            'peminjaman'
+        ))->render();
+        return response()->json([
+            'success' => true,
+            'html' => $view
+        ]);
+        
+    }
 
     public function destroy($id)
     {

@@ -84,7 +84,7 @@
             list_peminjaman();
 
             $(document).on("click", "#btn-konfirmasi", function() {
-                
+
                 var id = $(this).attr('data-id');
                 var url = '{{ route('mahasiswa.peminjaman.show', ':id') }}';
                 url = url.replace(':id', id);
@@ -101,33 +101,34 @@
     </script>
 
     <script>
-    // Tombol Detail Barang
-            $(document).on("click", ".btn-detail", function() {
-                    var id = $(this).attr("data-id");
-                    var url = "{{ route('mahasiswa.peminjaman.detail', ':id_data') }}";
-                    url = url.replace(":id_data", id);
-                    $.ajax({
-                            method: "GET",
-                            url: url,
-                        })
-                        .done(function(data) {
-                            $('#tempat-modal').html(data.html);
-                            $('#modal_detail').modal('show');
-                        })
+        // Tombol Detail Barang
+        $(document).on("click", ".btn-detail", function() {
+            var id = $(this).attr("data-id");
+            var url = "{{ route('mahasiswa.peminjaman.detail', ':id_data') }}";
+            url = url.replace(":id_data", id);
+            $.ajax({
+                    method: "GET",
+                    url: url,
                 })
+                .done(function(data) {
+                    $('#tempat-modal').html(data.html);
+                    $('#modal_detail').modal('show');
+                })
+        })
 
-    function confirmDelete(event) {
-        // Menampilkan pesan konfirmasi
-        var confirmation = confirm("Apakah Anda yakin ingin menghapus data ini?");
-
-
-        if (confirmation) {
-            // Lakukan submit form
-            $(event.target).closest('form').submit();
-        } else {
-            // Batalkan aksi default klik tombol
-            event.preventDefault();
-        }
-    }
-</script>
+        // Tombol Hapus/Delete
+        $(document).on("click", "#btn-delete", function() {
+            var id = $(this).attr("data-id");
+            var url = "{{ route('mahasiswa.peminjaman.delete', ':id_data') }}";
+            url = url.replace(":id_data", id);
+            $.ajax({
+                    method: "GET",
+                    url: url,
+                })
+                .done(function(data) {
+                    $('#tempat-modal').html(data.html);
+                    $('#modal_show').modal('show');
+                })
+        })
+    </script>
 @endpush

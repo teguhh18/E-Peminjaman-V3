@@ -66,19 +66,19 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth_mahasiswa'])->group(function () {
-    Route::get('/aset', [MahasiswaBarangController::class, 'index'])->name('aset');
+    // Route::get('/aset', [MahasiswaBarangController::class, 'index'])->name('aset');
 
-    Route::get('/ruangan', [RuanganController::class, 'index'])->name('ruangan');
-    Route::get('/ruangan/get', [RuanganController::class, 'get'])->name('ruangan.get');
-    Route::get('/ruangan/byGedung/{id}', [RuanganController::class, 'byGedung'])->name('ruangan.byGedung');
+    // Route::get('/ruangan', [RuanganController::class, 'index'])->name('ruangan');
+    // Route::get('/ruangan/get', [RuanganController::class, 'get'])->name('ruangan.get');
+    // Route::get('/ruangan/byGedung/{id}', [RuanganController::class, 'byGedung'])->name('ruangan.byGedung');
 
-    Route::Resource('/ruangan/booking', BookingController::class)->names('mahasiswa.ruangan');
+    // Route::Resource('/ruangan/booking', BookingController::class)->names('mahasiswa.ruangan');
 
 
-    Route::Resource('/barang', MahasiswaBarangController::class)->names('mahasiswa.barang');
-    Route::get('/aset/get', [MahasiswaBarangController::class, 'get']);
-    Route::get('/barang/peminjaman/{id}', [MahasiswaBarangController::class, 'daftar_peminjaman'])->name('mahasiswa.barang.daftar');
-    Route::get('/barang/detailpinjam/{id}', [MahasiswaBarangController::class, 'detailpinjam'])->name('mahasiswa.barang.detailpinjam');
+    // Route::Resource('/barang', MahasiswaBarangController::class)->names('mahasiswa.barang');
+    // Route::get('/aset/get', [MahasiswaBarangController::class, 'get']);
+    // Route::get('/barang/peminjaman/{id}', [MahasiswaBarangController::class, 'daftar_peminjaman'])->name('mahasiswa.barang.daftar');
+    // Route::get('/barang/detailpinjam/{id}', [MahasiswaBarangController::class, 'detailpinjam'])->name('mahasiswa.barang.detailpinjam');
 
     Route::resource('/detailpeminjaman', DetailpeminjamanController::class)->names('mahasiswa.detailpeminjaman');
     Route::get('/detailpeminjaman/add/', [DetailpeminjamanController::class, 'index'])->name('mahasiswa.detailpeminjaman.add');
@@ -90,6 +90,7 @@ Route::middleware(['auth_mahasiswa'])->group(function () {
     Route::get('/peminjaman/list-peminjaman', [PeminjamanController::class, 'list_peminjaman'])->name('mahasiswa.peminjaman.list-peminjaman');
     Route::get('/peminjaman/detail_barang/{id}', [PeminjamanController::class, 'detail_barang'])->name('mahasiswa.peminjaman.detail');
     
+    Route::get('/peminjaman/hapus-peminjaman/{id}', [PeminjamanController::class, 'confirmDelete'])->name('mahasiswa.peminjaman.delete');
     Route::Resource('/peminjaman', PeminjamanController::class)->names('mahasiswa.peminjaman');
     // Route::get('/cek-ketersediaan-ruangan', [PeminjamanController::class, 'cekKetersediaanRuangan'])->name('cek.ketersediaan.ruangan');
     // Route::get('/cek-ketersediaan-barang', [PeminjamanController::class, 'cekKetersediaanBarang'])->name('cek.ketersediaan.barang');

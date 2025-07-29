@@ -174,14 +174,13 @@ class PeminjamanController extends Controller
 
             // Jika semua proses di atas berhasil, commit transaksi
             DB::commit();
-
-            return redirect()->route('admin.booking.index')->with('msg', 'Berhasil Membuat Pengajuan Peminjaman');
+            return redirect()->route('admin.booking.index')->with(['msg' => 'Berhasil Membuat Peminjaman', 'class' => 'alert-success']);
         } catch (\Exception $e) {
             // Jika ada error di mana pun dalam blok 'try', batalkan semua
             DB::rollBack();
             // simpan error di log
             Log::error('Gagal menyimpan peminjaman: ' . $e->getMessage());
-            return back()->with('msg', 'Terjadi kesalahan. Gagal Membuat Pengajuan Peminjaman.')->withInput();
+            return back()->with(['msg' => 'Terjadi Kesalahan, Gagal Membuat Peminjaman', 'class' => 'alert-danger'])->withInput();
         }
     }
 
@@ -339,11 +338,11 @@ class PeminjamanController extends Controller
 
             DB::commit();
 
-            return redirect()->route('admin.booking.index')->with('msg', 'Berhasil memperbarui pengajuan.');
+            return redirect()->route('admin.booking.index')->with(['msg' => 'Berhasil Mengubah Peminjaman', 'class' => 'alert-success']);
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Gagal memperbarui peminjaman: ' . $e->getMessage());
-            return back()->with('msg', 'Terjadi kesalahan. Gagal memperbarui pengajuan.')->withInput();
+            return back()->with(['msg' => 'Terjadi Kesalahan, Gagal Mengubah Peminjaman', 'class' => 'alert-danger'])->withInput();
         }
     }
 

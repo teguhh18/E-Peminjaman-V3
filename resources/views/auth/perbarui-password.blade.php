@@ -4,7 +4,9 @@
     <div class="row justify-content-center">
         <div class="col-md-6 col-md-offset-3">
             <div class="card">
-                <div class="card-header">Perbarui Password</div>
+                <div class="card-header">
+                    <h3>Perbarui Password</h3>
+                </div>
 
                 <div class="card-body">
                     @if (session('error'))
@@ -67,9 +69,9 @@
                         <div class="form-group mt-2 row">
                             <div class="col-md-6 col-md-offset-4">
                                 <a href="{{ route('home.index') }}" class="btn btn-sm btn-default"><i
-                                        class="fa fa-arrow-left"></i> Kembali</a>
+                                        class="fa fa-arrow-left me-1"></i> Kembali</a>
                                 <button type="submit" class="btn btn-sm btn-primary">
-                                    <i class="fa fa-edit"></i> Perbarui Password
+                                    <i class="fa fa-edit me-1"></i> Perbarui Password
                                 </button>
                             </div>
                         </div>

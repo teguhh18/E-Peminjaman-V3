@@ -37,7 +37,7 @@
                     <i class="fas fa-angle-right"></i> Gedung : {{ $barang->ruangan->gedung->nama }} <br>
                     <i class="fas fa-angle-right"></i> Ruang : {{ $barang->ruangan->nama_ruangan }} <br>
                 </td>
-                <td>{{ $barang->penanggung_jawab }}</td>
+                <td>{{ $barang->unitkerja->nama ?? '-'}}</td>
                 {{-- <td>{{ date('d-m-Y', strtotime($barang->tgl_perolehan)) }}</td> --}}
                 {{-- <td>Rp.{{ number_format($barang->harga_perolehan, 0, ',', '.') }}</td> --}}
                 @php

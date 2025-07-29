@@ -21,7 +21,7 @@
                         <div><b> Kegiatan :</b> {{ $peminjaman->kegiatan }}</div>
                     </td>
 
-                     {{-- KOLOM WAKTU --}}
+                    {{-- KOLOM WAKTU --}}
                     <td style="min-width:100px; white-space: nowrap;" class="small">
                         <strong class="text-success">Mulai:</strong>
                         <div>
@@ -52,8 +52,7 @@
                         @if (!$peminjaman->detail_peminjaman->isEmpty())
                             <div class="{{ $peminjaman->ruangan ? 'mt-2' : '' }}">
                                 <strong>Barang:</strong>
-                                <span class="btn btn-info btn-sm btn-detail"
-                                    data-id="{{ $peminjaman->id }}">
+                                <span class="btn btn-info btn-sm btn-detail" data-id="{{ $peminjaman->id }}">
                                     <i class="fa fa-eye me-1"></i>Detail Barang
                                 </span>
                             </div>
@@ -148,20 +147,17 @@
                         @endswitch
                     </td>
                     <td>
-                       
+
                         @if ($peminjaman->status_peminjaman == 'menunggu')
                             <a href="{{ route('mahasiswa.peminjaman.edit', encrypt($peminjaman->id)) }}"
                                 class="badge bg-green text-green-fg btn btn-edit" data-id="{{ $peminjaman->id }}"><i
                                     class="fas fa-edit me-1"></i>
-                                Edit</a>
-                            <form action="{{ route('mahasiswa.peminjaman.destroy', $peminjaman->id) }}" method="post"
-                                id="deleteForm" style="display: inline-block">
-                                @csrf
-                                @method('delete')
-                                <button type="submit" onclick="confirmDelete(event)"
-                                    class="badge bg-red text-red-fg mt-2"><i class="fa fa-times"></i>
-                                    hapus</button>
-                            </form>
+                                Edit
+                            </a>
+                            <button type="submit" id="btn-delete" data-id="{{ encrypt($peminjaman->id) }}"
+                                class="badge bg-red text-red-fg mt-2"><i class="fa fa-times"></i>
+                                hapus
+                            </button>
                         @endif
 
                         @if (in_array($peminjaman->status_peminjaman, ['disetujui', 'aktif', 'selesai']))

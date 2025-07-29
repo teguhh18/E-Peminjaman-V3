@@ -8,8 +8,8 @@
                 <div class="card-header">
                     <h3 class="card-title">Form Tambah Unit Kerja </h3>
                     <div class="card-actions">
-                        <a href="{{ route('admin.unit.index') }}" class="btn btn-xs btn-warning btn-add">
-                            <i class="fa fa-arrow-left"></i> kembali
+                        <a href="{{ route('admin.unit.index') }}" class="btn btn-sm btn-warning btn-add">
+                            <i class="fa fa-arrow-left me-1"></i>kembali
                         </a>
                     </div>
                 </div>
@@ -46,7 +46,7 @@
                     </div>
 
                     <div class="card-footer">
-                        <button type="submit" class="btn btn-primary"><i class="fa fa-save"></i> Simpan</button>
+                        <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-save me-1"></i> Simpan</button>
                     </div>
                 </form>
 

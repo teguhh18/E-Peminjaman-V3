@@ -30,7 +30,7 @@
                             </select>
                         </div>
                     </form>
-                    <button type="button" class="btn btn-primary" id="lihatDataBtn">Lihat Data</button>
+                    <button type="button" class="btn btn-primary btn-sm" id="lihatDataBtn"><i class="fa fa-eye me-1"></i>Lihat Data</button>
                 </div>
             </div>
 
@@ -60,7 +60,7 @@
                     </table>
 
                     {{-- <button type="" class="btn btn-primary">Cetak Laporan</button> --}}
-                    <button type="button" class="btn btn-primary" id="cetakLaporanBtn" onclick="cetakLaporan()">Cetak
+                    <button type="button" class="btn btn-primary btn-sm" id="cetakLaporanBtn" onclick="cetakLaporan()"><i class="fa fa-print me-1"></i>Cetak
                         Laporan
                     </button>
                 </div>

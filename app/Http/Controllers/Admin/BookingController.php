@@ -219,6 +219,6 @@ class BookingController extends Controller
     public function destroy($id)
     {
         Peminjaman::where("id", $id)->delete();
-        return back()->with('msg', 'Berhasil Menghapus Data');
+        return back()->with(['msg' => 'Berhasil Menghapus', 'class' => 'alert-success']);
     }
 }
