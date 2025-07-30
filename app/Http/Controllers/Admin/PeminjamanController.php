@@ -49,6 +49,7 @@ class PeminjamanController extends Controller
 
     public function getUser(Request $request)
     {
+        // dd($request->user_id);
         // $user = User::find($request->user_id);
         $user = User::with('mahasiswa')->find($request->user_id);
         return response()->json($user);

@@ -66,49 +66,27 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth_mahasiswa'])->group(function () {
-    // Route::get('/aset', [MahasiswaBarangController::class, 'index'])->name('aset');
-
-    // Route::get('/ruangan', [RuanganController::class, 'index'])->name('ruangan');
-    // Route::get('/ruangan/get', [RuanganController::class, 'get'])->name('ruangan.get');
-    // Route::get('/ruangan/byGedung/{id}', [RuanganController::class, 'byGedung'])->name('ruangan.byGedung');
-
-    // Route::Resource('/ruangan/booking', BookingController::class)->names('mahasiswa.ruangan');
-
-
-    // Route::Resource('/barang', MahasiswaBarangController::class)->names('mahasiswa.barang');
-    // Route::get('/aset/get', [MahasiswaBarangController::class, 'get']);
-    // Route::get('/barang/peminjaman/{id}', [MahasiswaBarangController::class, 'daftar_peminjaman'])->name('mahasiswa.barang.daftar');
-    // Route::get('/barang/detailpinjam/{id}', [MahasiswaBarangController::class, 'detailpinjam'])->name('mahasiswa.barang.detailpinjam');
-
-    Route::resource('/detailpeminjaman', DetailpeminjamanController::class)->names('mahasiswa.detailpeminjaman');
-    Route::get('/detailpeminjaman/add/', [DetailpeminjamanController::class, 'index'])->name('mahasiswa.detailpeminjaman.add');
-
-
     // Peminjaman
-    // modal barang
-    // Route::get('/peminjaman/modal-barang', [PeminjamanController::class, 'modalBarang'])->name('mahasiswa.peminjaman.modal-barang');
     Route::get('/peminjaman/list-peminjaman', [PeminjamanController::class, 'list_peminjaman'])->name('mahasiswa.peminjaman.list-peminjaman');
     Route::get('/peminjaman/detail_barang/{id}', [PeminjamanController::class, 'detail_barang'])->name('mahasiswa.peminjaman.detail');
-    
+
     Route::get('/peminjaman/hapus-peminjaman/{id}', [PeminjamanController::class, 'confirmDelete'])->name('mahasiswa.peminjaman.delete');
     Route::Resource('/peminjaman', PeminjamanController::class)->names('mahasiswa.peminjaman');
-    // Route::get('/cek-ketersediaan-ruangan', [PeminjamanController::class, 'cekKetersediaanRuangan'])->name('cek.ketersediaan.ruangan');
-    // Route::get('/cek-ketersediaan-barang', [PeminjamanController::class, 'cekKetersediaanBarang'])->name('cek.ketersediaan.barang');
     Route::get('/get-barang', [PeminjamanController::class, 'getBarang'])->name('get.barang');
-    Route::get('/cetakPdf/{id}', [PeminjamanController::class, 'cetakPdf'])->middleware(['auth'])->name('mahasiswa.peminjaman.cetak');
-    
-
+    Route::get('/cetakPdf/{id}', [PeminjamanController::class, 'cetakPdf'])->name('mahasiswa.peminjaman.cetak');
     Route::get('/home', [HomeController::class, 'index'])->name('home');
-    Route::Resource('/peminjaman-barang', PeminjamanBarangController::class)->names('mahasiswa.pinjam-barang');
-    Route::get('/peminjaman-barang/dataBarang', [PeminjamanBarangController::class, 'dataBarang'])->name('mahasiswa.pinjam-barang.dataBarang');
 });
 
-// List Tabel Approver peminjaman
-Route::get('/list-approver', [PeminjamanController::class, 'listApprover'])->name('mahasiswa.peminjaman.list-approver')->middleware('auth');
-// Route Modal pilih/tambah Barang untuk form peminjaman (*Dibuat middleware 'auth' agar bisa juga diakses oleh admin)
-Route::get('/modal-barang', [PeminjamanController::class, 'modalBarang'])->name('mahasiswa.peminjaman.modal-barang')->middleware('auth');
 
-// Route cek ketersedian Barang untuk form peminjaman (*Dibuat middleware 'auth' agar bisa juga diakses oleh admin)
-Route::get('/cek-ketersediaan-barang', [PeminjamanController::class, 'cekKetersediaanBarang'])->name('cek.ketersediaan.barang')->middleware('auth');
-// Route cek ketersedian Ruangan untuk form peminjaman (*Dibuat middleware 'auth' agar bisa juga diakses oleh admin)
-Route::get('/cek-ketersediaan-ruangan', [PeminjamanController::class, 'cekKetersediaanRuangan'])->name('cek.ketersediaan.ruangan')->middleware('auth');
+// (*Dibuat middleware 'auth' agar bisa juga diakses oleh admin dan baak)
+Route::middleware(['auth'])->group(function () {
+    // List Tabel Approver peminjaman
+    Route::get('/list-approver', [PeminjamanController::class, 'listApprover'])->name('mahasiswa.peminjaman.list-approver');
+    // Route Modal pilih/tambah Barang untuk form peminjaman 
+    Route::get('/modal-barang', [PeminjamanController::class, 'modalBarang'])->name('mahasiswa.peminjaman.modal-barang');
+
+    // Route cek ketersedian Barang untuk form peminjaman 
+    Route::get('/cek-ketersediaan-barang', [PeminjamanController::class, 'cekKetersediaanBarang'])->name('cek.ketersediaan.barang');
+    // Route cek ketersedian Ruangan untuk form peminjaman 
+    Route::get('/cek-ketersediaan-ruangan', [PeminjamanController::class, 'cekKetersediaanRuangan'])->name('cek.ketersediaan.ruangan');
+});

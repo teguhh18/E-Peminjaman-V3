@@ -5,8 +5,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Mahasiswa\BookingController;
 use Illuminate\Support\Facades\Artisan;
-use App\Http\Controllers\Mahasiswa\PeminjamanController As MahasiswaPeminjamanController;
-use App\Http\Controllers\Mahasiswa\RuanganController;
 
 /*
 |--------------------------------------------------------------------------
@@ -34,23 +32,14 @@ Route::get('/', function () {
     return redirect('login');
 });
 
-Route::get('/perbarui-password', [HomeController::class, 'perbarui_password'])->middleware(['auth'])->name('perbarui_password');
-Route::post('/perbarui-password/updatepw', [HomeController::class, 'updatepw'])->middleware(['auth'])->name('perbaruipassword_new');
-Route::resource('/dashboard', HomeController::class)->middleware(['auth'])->names('home');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/perbarui-password', [HomeController::class, 'perbarui_password'])->name('perbarui_password');
+    Route::post('/perbarui-password/updatepw', [HomeController::class, 'updatepw'])->name('perbaruipassword_new');
+    Route::resource('/dashboard', HomeController::class)->names('home');
 
-// Cetak PDF
-Route::get('/CetakPeminjaman/{id}', [MahasiswaPeminjamanController::class, 'PrintPdf'])->middleware(['auth'])->name('mahasiswa.peminjaman.cetak');
-Route::get('/CetakBooking/{id}', [BookingController::class, 'PrintPdf'])->middleware(['auth'])->name('mahasiswa.booking.cetak');
-
-
-Route::get('/ruangan/listPeminjaman', [RuanganController::class, 'list_peminjaman'])->middleware('auth_mahasiswa')->name('ruangan.list');
-// Route::get('/ruangan/ubahPeminjaman/{id}', [RuanganController::class, 'ubah_peminjaman'])->middleware('auth_mahasiswa')->name('mahasiswa.ruangan.ubah');
-
-
-Route::get('/profil', [HomeController::class, 'profil'])->middleware('auth')->name('profil');
-Route::put('/profil/update/{id}', [HomeController::class, 'profil_update'])->middleware('auth')->name('profil_update');
-
-
+    Route::get('/profil', [HomeController::class, 'profil'])->name('profil');
+    Route::put('/profil/update/{id}', [HomeController::class, 'profil_update'])->name('profil_update');
+});
 
 require __DIR__ . '/admin.php';
 require __DIR__ . '/auth.php';

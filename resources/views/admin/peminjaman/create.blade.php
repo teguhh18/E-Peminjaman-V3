@@ -197,7 +197,7 @@
             // Untuk isi input Prodi, NPM/Username, dan NO Telepon Secara Otomatis setelah pilih nama
             $('#nama_id').on('change', function() {
                 const id = $(this).val();
-                const user_id = $('#user_id');
+                // const user_id = $('#nama_id');
                 const prodi = $('#prodi');
                 const username = $('#username'); //Username itu dipakai untuk NPM
                 const no_telepon = $('#no_telepon');
@@ -208,7 +208,7 @@
                 }, function(res) {
                     // console.log(res)
                     const namaProdi = res.mahasiswa ? res.mahasiswa.nama_program_studi : '';
-                    user_id.attr('value', res.id); //set value input hidden User_id
+                    // user_id.attr('value', res.id); //set value input hidden User_id
                     prodi.attr('value', namaProdi); //set value input nama prodi
                     username.attr('value', res.username); //set value input NPM/username
                     no_telepon.attr('value', res.no_telepon); //set value input NO Telepon

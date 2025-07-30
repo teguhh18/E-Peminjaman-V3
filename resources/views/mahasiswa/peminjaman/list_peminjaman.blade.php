@@ -67,25 +67,12 @@
                     <td>
                         @foreach ($peminjaman->persetujuan_peminjaman as $persetujuan)
                             @php
-                                $role = $persetujuan->approval_role;
-                                $unit = $persetujuan->unit_kerja->kode ?? $role;
-                                $user = $persetujuan->user?->name;
+                                $unit = $persetujuan->unit_kerja->kode;
+                                // $user = $persetujuan->user?->name;
                                 $status = $persetujuan->status;
                                 $statusText = '';
-
-                                // Tampilan status approve berdasarkan role
-                                if ($role === 'kerumahtanggan') {
-                                    $statusText = "<b>$unit</b> $status" . ($user ? " oleh $user" : '');
-                                } elseif ($role === 'kaprodi') {
-                                    $statusText =
-                                        '<b>kaprodi ' .
-                                        ($persetujuan->peminjaman->user->prodi->kode_prodi ?? '') .
-                                        '</b> ' .
-                                        $status .
-                                        ($user ? " oleh $user" : '');
-                                } else {
-                                    $statusText = "<b>Tata Usaha $unit</b> $status" . ($user ? " oleh $user" : '');
-                                }
+                                    // $statusText = "<b>Tata Usaha $unit</b> $status" . ($user ? " oleh $user" : '');
+                                    $statusText = "$status <b>Tata Usaha $unit</b> ";
 
                                 // Tampilan warna approve berdasarkan statusnya
                                 switch ($persetujuan->status) {

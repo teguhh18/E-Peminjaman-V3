@@ -124,7 +124,7 @@
     <div class="page-container">
         <table>
             <tr>
-                <td style="width: 15%; text-align: right; padding-right: 10px;">
+                <td style="width: 15%; text-align: left; padding-right: 10px;">
                     <img src="{{ asset('img/Tekno.png') }}" class="header-logo" alt="Logo">
                 </td>
                 <td class="header-kop" style="width: 70%;">
@@ -139,7 +139,6 @@
                 </td>
             </tr>
         </table>
-
         <hr>
 
         <table style="margin-top: 15px;">
@@ -197,7 +196,7 @@
                     <th style="width: 5%;">No.</th>
                     <th>Nama Barang/Alat</th>
                     <th style="width: 15%;">Jumlah</th>
-                    <th style="width: 20%;">Checklist</th>
+                    {{-- <th style="width: 20%;">Checklist</th> --}}
                 </tr>
             </thead>
             <tbody>
@@ -206,7 +205,6 @@
                         <td class="text-center">1</td>
                         <td><b>Ruangan Beserta Fasilitas</b></td>
                         <td></td>
-                        <td></td>
                     </tr>
                 @endif
                 @foreach ($dataPeminjaman->detail_peminjaman as $detail)
@@ -214,7 +212,6 @@
                         <td class="text-center">{{ $loop->iteration + 1 }}</td>
                         <td>{{ $detail->barang->nama }}</td>
                         <td class="text-center">{{ $detail->jml_barang }}</td>
-                        <td></td>
                     </tr>
                 @endforeach
 

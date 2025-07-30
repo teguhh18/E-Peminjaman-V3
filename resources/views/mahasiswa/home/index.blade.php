@@ -58,7 +58,7 @@
             <div class="card-body p-0">
                 <div class="row">
                     @forelse ($listPeminjaman as $peminjaman)
-                        <div class="col-md-6 col-lg-4 mb-4">
+                        <div class="col-md-6 col-lg-3 mb-4">
                             {{-- Kartu dengan tema gelap untuk kontras maksimal --}}
                             <div class="card h-100 shadow-lg border-0 card-interactive"
                                 style="background-color: #2c3e50; color: #ecf0f1;">
@@ -84,7 +84,7 @@
                                                         style="color: #e74c3c; font-size: 0.8rem;"></i>
                                                     <div class="bg-red" style="width: 2px; height: 40px; opacity: 0.5;">
                                                     </div>
-                                                    <i class="ti ti-circle" style="color: #e74c3c; font-size: 0.8rem;"></i>
+                                                    <i class="fa fa-circle" style="color: #e74c3c; font-size: 0.8rem;"></i>
                                                 </div>
                                             </div>
                                             {{-- Detail Waktu --}}
@@ -116,7 +116,7 @@
                                     <div class="mt-4 text-center">
                                         <a href="#" class="btn btn-red w-100 btn-detail"
                                             data-id="{{ $peminjaman->id }}">
-                                            Detail
+                                            <i class="fa fa-eye me-1"></i>Detail
                                         </a>
                                     </div>
                                 </div>

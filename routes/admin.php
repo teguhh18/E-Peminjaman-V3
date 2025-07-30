@@ -20,14 +20,8 @@ use App\Http\Controllers\Admin\UnitkerjaController;
 use App\Http\Controllers\Admin\UserController;
 
 // Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware(['auth_admin'])->name('admin.dashboard');
-Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware(['auth_baak'])->name('admin.dashboard');
 
-Route::resource('/master/kegiatan', AdminKegiatanController::class)->middleware(['auth_admin'])->names('admin.kegiatan');
-// Route::resource('/master/kegiatan', AdminKegiatanController::class)->middleware(['auth'])->names('admin.kegiatan');
-Route::resource('/master/barang', BarangController::class)->middleware(['auth_admin'])->names('admin.barang');
-Route::get('barang/excel-export', [BarangController::class, 'exportExcel'])->middleware(['auth_admin'])->name('excelExport');
 
-Route::get('/CetakQrCode/{ruangan_id}', [BarangController::class, 'QrCode'])->middleware(['auth_admin'])->name('admin.barang.QrCode');
 
 // Scan QR Code Peminjaman Ruangan
 Route::get('/scanPinjamRuangan', [ScanQRCodeController::class, 'index'])->middleware(['auth_baak'])->name('scan.pinjamRuangan');
@@ -37,45 +31,58 @@ Route::get('/scanPinjamRuangan/checkId/{id}', [ScanQRCodeController::class, 'che
 Route::get('/scanPinjamBarang', [ScanQRCodeController::class, 'barang'])->middleware(['auth_baak'])->name('scan.pinjamBarang');
 Route::get('/scanPinjamBarang/checkId/{id}', [ScanQRCodeController::class, 'checkIdBarang'])->middleware(['auth_baak'])->name('scan.pinjamBarang.checkId');
 
+// ROUTE HANYA ADMIN BISA AKSES (auth_admin)
+Route::middleware(['auth_admin'])->group(function () {
+    // DATA MASTER
+    Route::resource('/mahasiswa', MahasiswaController::class)->names('admin.mahasiswa');
+    Route::resource('/master/prodi', ProdiController::class)->names('admin.prodi');
+    Route::resource('/master/unit', UnitkerjaController::class)->names('admin.unit');
+    Route::resource('/master/gedung', GedungController::class)->names('admin.gedung');
+    Route::resource('/master/ruangan', RuanganController::class)->names('admin.ruangan');
+    Route::resource('/master/barang', BarangController::class)->names('admin.barang');
+    Route::resource('/master/kegiatan', AdminKegiatanController::class)->names('admin.kegiatan');
+    Route::resource('/master/user', UserController::class)->names('admin.user');
 
-Route::get('/filterBarang', [BarangController::class, 'filter'])->middleware(['auth_admin'])->name('admin.barang.filter');
-Route::get('/filterBarang/{gedung_id}', [BarangController::class, 'ruanganByGedung'])->middleware(['auth_admin'])->name('admin.barang.filterRuanganByGedung');
+    // EXPORT DATA BARANG KE EXCEL
+    Route::get('barang/excel-export', [BarangController::class, 'exportExcel'])->name('excelExport');
 
-Route::resource('/master/ruangan', RuanganController::class)->middleware(['auth_admin'])->names('admin.ruangan');
+    // LAPORAN PEMINJAMAN
+    Route::get('/master/laporan', [PeminjamanController::class, 'laporan'])->name('admin.laporan');
+    Route::get('/master/laporan/data', [PeminjamanController::class, 'fetchDataLaporan'])->name('fetch.data.laporan');
+    Route::get('/master/laporan/cetak', [PeminjamanController::class, 'cetakLaporan'])->name('admin.cetak.laporan');
 
+    // CETAK QRCODE BARANG (FILTER PER RUANGAN)
+    Route::get('/filterBarang', [BarangController::class, 'filter'])->name('admin.barang.filter');
+    Route::get('/filterBarang/{gedung_id}', [BarangController::class, 'ruanganByGedung'])->name('admin.barang.filterRuanganByGedung');
+    Route::get('/CetakQrCode/{ruangan_id}', [BarangController::class, 'QrCode'])->name('admin.barang.QrCode');
 
-Route::resource('/master/gedung', GedungController::class)->middleware(['auth_admin'])->names('admin.gedung');
+    // MODAL DELETE PEMINJAMAN
+    Route::get('/master/booking/modal-delete/{id}', [BookingController::class, 'modalDelete'])->name('admin.booking.modal-delete');
+});
 
-// Route::resource('/master/peminjaman', PeminjamanBarangController::class)->middleware(['auth_admin'])->names('admin.peminjaman');
-// Route::get('master/peminjaman/ubah/{id}', [PeminjamanBarangController::class, 'ubah'])->middleware(['auth_admin'])->name('admin.peminjaman.ubah');
+// ROUTE ADMIN DAN BAAK BISA AKSES (auth_baak)
+Route::middleware(['auth_baak'])->group(function () {
+    // DASHBOARD
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-// Route pengelolaaann pengajuan Peminjaman/Booking
-Route::get('/master/booking/detail_barang/{id}', [BookingController::class, 'detail_barang'])->middleware(['auth_baak'])->name('admin.booking.detail');
-Route::get('/master/booking/adminKonfirmasi/{id}', [BookingController::class, 'adminKonfirmasi'])->middleware(['auth_baak'])->name('admin.booking.konfirmasi');
-Route::get('/master/booking/modal-delete/{id}', [BookingController::class, 'modalDelete'])->middleware(['auth_baak'])->name('admin.booking.modal-delete');
-Route::resource('/master/booking', BookingController::class)->middleware(['auth_baak'])->names('admin.booking');
+    // JADWAL PEMINJAMAN (FULLCALENDAR)
+    Route::get('/master/jadwal', [JadwalController::class, 'index'])->name('admin.jadwal');
+    Route::get('/master/jadwal/filter', [JadwalController::class, 'filter'])->name('admin.jadwal.filter');
 
-// Route Pengembalian
-Route::put('/master/pengembalian/status_ruangan/{id}', [PengembalianController::class, 'status_ruangan'])->middleware(['auth_baak'])->name('admin.pengembalian.status_ruangan');
-Route::resource('/master/pengembalian', PengembalianController::class)->middleware(['auth_baak'])->names('admin.pengembalian');
+    // MENGELOLA LIST PEMINJAMAN/BOOKING
+    Route::resource('/master/booking', BookingController::class)->names('admin.booking');
+    Route::get('/master/booking/detail_barang/{id}', [BookingController::class, 'detail_barang'])->name('admin.booking.detail');
+    Route::get('/master/booking/adminKonfirmasi/{id}', [BookingController::class, 'adminKonfirmasi'])->name('admin.booking.konfirmasi');
 
-// Route Admin Bypass Tambah Peminjaman
-Route::get('/master/peminjaman/get-user', [PeminjamanController::class, 'getUser'])->name('get.user');
-Route::get('/modal-approver', [PeminjamanController::class, 'modalApprover'])->name('admin.peminjaman.modal-approver')->middleware('auth_baak');
-Route::resource('/master/peminjaman', PeminjamanController::class)->middleware(['auth_baak'])->names('admin.peminjaman');
+    // UNTUK AMBIL DATA USER PADA BAGIAN CREATE DAN EDIT PEMINJAMAN
+    Route::get('get-user', [PeminjamanController::class, 'getUser'])->name('get.user');
+    // MODAL PILIH APPROVER
+    Route::get('/modal-approver', [PeminjamanController::class, 'modalApprover'])->name('admin.peminjaman.modal-approver');
 
-// Laporan Peminjaman
-Route::get('/master/laporan', [PeminjamanController::class, 'laporan'])->middleware(['auth_admin'])->name('admin.laporan');
-Route::get('/master/laporan/data', [PeminjamanController::class, 'fetchDataLaporan'])->middleware('auth_admin')->name('fetch.data.laporan');
-Route::get('/master/laporan/cetak', [PeminjamanController::class, 'cetakLaporan'])->middleware(['auth_admin'])->name('admin.cetak.laporan');
+    // UNTUK CREATE DAN EDIT PEMINJAMAN (ADMIN & BAAK)
+    Route::resource('/master/peminjaman', PeminjamanController::class)->names('admin.peminjaman');
 
-// Jadwal Peminjaman
-Route::get('/master/jadwal', [JadwalController::class, 'index'])->middleware(['auth_baak'])->name('admin.jadwal');
-Route::get('/master/jadwal/filter', [JadwalController::class, 'filter'])->middleware(['auth_baak'])->name('admin.jadwal.filter');
-
-
-Route::resource('/master/user', UserController::class)->middleware(['auth_admin'])->names('admin.user');
-Route::resource('/master/unit', UnitkerjaController::class)->middleware(['auth_admin'])->names('admin.unit');
-Route::resource('/master/prodi', ProdiController::class)->middleware(['auth_admin'])->names('admin.prodi');
-
-Route::resource('/mahasiswa', MahasiswaController::class)->middleware(['auth_admin'])->names('admin.mahasiswa');
+    // UNTUK UPDATE STATUS BARANG DAN RUANGAN DI PEMINJAMAN
+    Route::put('/master/pengembalian/status_ruangan/{id}', [PengembalianController::class, 'status_ruangan'])->name('admin.pengembalian.status_ruangan');
+    Route::resource('/master/pengembalian', PengembalianController::class)->names('admin.pengembalian');
+});
