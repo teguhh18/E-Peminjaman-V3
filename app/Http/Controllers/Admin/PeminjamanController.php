@@ -74,6 +74,7 @@ class PeminjamanController extends Controller
      */
     public function store(Request $request)
     {
+        // dd($request->all());
         // 1. Validasi Awal
         $request->validate([
             'kegiatan'           => 'required|string|max:255',
@@ -94,7 +95,7 @@ class PeminjamanController extends Controller
 
             // 4. Siapkan Data untuk Tabel Peminjaman Utama
             $dataPeminjaman = [
-                'user_id'            => $request->user_id,
+                'user_id'            => $request->nama_id,
                 'kegiatan'           => $request->kegiatan,
                 'no_peminjam'        => $request->no_telepon,
                 'waktu_peminjaman'   => date('Y-m-d H:i:s', strtotime($request->waktu_peminjaman)),
