@@ -1,159 +1,100 @@
 @extends('layouts.tabler-front.master')
 @section('content')
-    <div class="row">
-        <div class="col-md-12 ">
-            <h1 class="text-center m-b-0">{{ $title }}</h1>
-            <p></p>
-        </div>
-
-        <div id="respon">
-            @if (session()->has('msg'))
-                <div class="alert alert-warning">
-                    {{ session('msg') }}
-                    <button type="button" class="close" data-bs-dismiss="alert">×</button>
-                </div>
-            @endif
-        </div>
-
-        <div class="card">
-            <div class="card-body">
-                <a class="btn btn-outline-secondary btn-sm mb-2" href="{{ route('home') }}">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
-                        stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-                        class="icon icon-tabler icons-tabler-outline icon-tabler-arrow-left">
-                        <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                        <path d="M5 12l14 0" />
-                        <path d="M5 12l6 6" />
-                        <path d="M5 12l6 -6" />
-                    </svg>
-                    Kembali
-                </a>
-                <div class="card mb-2">
-
-                </div>
-                <div class="card">
-                    <div class="card-header bg-azure text-blue-fg">
-                        <strong>Form Peminjaman Ruangan & Peralatan</strong>
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            {{-- Notifikasi --}}
+            <div id="respon">
+                @if (session()->has('msg'))
+                    <div class="alert {{ session('class') ?? 'alert-info' }} alert-dismissible" role="alert">
+                        {{ session('msg') }}
+                        <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
                     </div>
+                @endif
+            </div>
+
+            <form action="{{ route('mahasiswa.peminjaman.store') }}" method="post" id="form-peminjaman">
+                @csrf
+                <div class="card">
+                    {{-- HEADER KARTU DENGAN WARNA MERAH --}}
+                    <div class="card-header bg-red text-white">
+                        <h3 class="card-title mb-0 text-white">
+                            <i class="ti ti-file-plus me-2"></i>
+                            Formulir Pengajuan Peminjaman
+                        </h3>
+                    </div>
+
                     <div class="card-body">
-                        <form action="{{ route('mahasiswa.peminjaman.store') }}" method="post" id="form-peminjaman">
-                            @csrf
+                        {{-- BAGIAN 1: INFORMASI PEMINJAM (READ-ONLY) --}}
+                        <h4 class="mb-3">1. Informasi Peminjam<small class="text-muted"> (Sesuaikan di bagian profil)</small></h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Nama</label>
+                                <input type="text" class="form-control" value="{{ Str::title($user->name) }}" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Program Studi</label>
+                                <input type="text" class="form-control"
+                                    value="{{ Str::title($user->mahasiswa->nama_program_studi) }}" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">NPM</label>
+                                <input type="text" class="form-control" value="{{ $user->username }}" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">No. Telepon</label>
+                                <input type="text" name="no_telepon" class="form-control"
+                                    value="{{ $user->no_telepon ?? '' }}" placeholder="Masukkan no. telepon aktif">
+                            </div>
+                        </div>
 
-                            <div class="row mt-2">
-                                <div class="col-md-6">
-                                    <fieldset class="form-group">
-                                        <label for="waktu_peminjaman" class="form-label">Waktu Peminjaman</label>
-                                        <input type="datetime-local" name="waktu_peminjaman" id="waktu_peminjaman"
-                                            class="form-control form-control-sm" placeholder="Pilih tanggal dan jam" required
-                                            value="{{ old('waktu_peminjaman') }}">
-                                    </fieldset>
-                                </div>
+                        <hr class="my-4">
 
-                                <div class="col-md-6">
-                                    <fieldset class="form-group">
-                                        <label for="name" class="form-label">Nama</label>
-                                        <input type="text" name="name" id="name" class="form-control form-control-sm"
-                                            value="{{ $user->name }}" disabled>
-                                    </fieldset>
+                        {{-- BAGIAN 2: DETAIL PENGAJUAN --}}
+                        <h4 class="mb-3">2. Detail Pengajuan</h4>
+                        <div class="mb-3">
+                            <label for="kegiatan" class="form-label required">Nama Kegiatan</label>
+                            <input type="text" name="kegiatan" id="kegiatan" class="form-control" required
+                                value="{{ old('kegiatan') }}" placeholder="Contoh: Rapat Koordinasi Himpunan">
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="waktu_peminjaman" class="form-label required">Waktu Mulai</label>
+                                <input type="datetime-local" name="waktu_peminjaman" id="waktu_peminjaman"
+                                    class="form-control" required value="{{ old('waktu_peminjaman') }}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="waktu_pengembalian" class="form-label required">Waktu Selesai</label>
+                                <input type="datetime-local" name="waktu_pengembalian" id="waktu_pengembalian"
+                                    class="form-control" required value="{{ old('waktu_pengembalian') }}">
+                            </div>
+                        </div>
+
+                        <hr class="my-4">
+
+                        {{-- BAGIAN 3: ASET YANG DIPINJAM --}}
+                        <h4 class="mb-3">3. Aset yang Dipinjam <small class="text-muted">(Opsional)</small></h4>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="ruangan_id" class="form-label">Pilih Ruangan</label>
+                                <select name="ruangan_id" id="ruangan_id" class="form-select">
+                                    <option value="">- Tidak pinjam ruangan -</option>
+                                    @foreach ($dataRuangan as $ruangan)
+                                        <option value="{{ $ruangan->id }}">{{ $ruangan->kode_ruangan }} -
+                                            {{ $ruangan->nama_ruangan }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Pilih Barang</label>
+                                <div>
+                                    <button type="button" class="btn btn-outline-primary btn-sm" data-bs-toggle="modal"
+                                        data-bs-target="#modalTambahBarang" id="btnTambahBarang">
+                                        <i class="fa fa-plus me-1"></i> Tambah Barang
+                                    </button>
                                 </div>
                             </div>
-
-                            <div class="row mt-2">
-                                <div class="col-md-6">
-                                    <fieldset class="form-group">
-                                        <label for="waktu_pengembalian" class="form-label">Sampai Dengan</label>
-                                        <input type="datetime-local" name="waktu_pengembalian" id="waktu_pengembalian"
-                                            class="form-control form-control-sm" required value="{{ old('waktu_pengembalian') }}">
-                                    </fieldset>
-                                </div>
-
-                                <div class="col-md-6">
-                                    <fieldset class="form-group">
-                                        <label for="prodi" class="form-label">Program Studi</label>
-                                        <input type="text" name="prodi" id="prodi" class="form-control form-control-sm" required
-                                            value="{{ $user->mahasiswa->nama_program_studi }}" disabled>
-                                    </fieldset>
-                                </div>
-
-                            </div>
-
-                            <div class="row mt-2">
-                                <div class="col-md-6">
-                                    <label for="ruangan" class="form-label">Pilih Ruangan <small
-                                            class="text-danger">*Kosongkan Jika hanya ingin pinjam barang
-                                            saja</small></label>
-
-                                    <select name="ruangan_id" id="ruangan_id"
-                                        class="form-select @error('ruangan_id') is-invalid @enderror">
-                                        <option value="">-Pilih Ruangan-</option>
-                                        @foreach ($dataRuangan as $ruangan)
-                                            <option value="{{ $ruangan->id }}">{{ $ruangan->kode_ruangan }} -
-                                                {{ $ruangan->nama_ruangan }}
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                    @error('ruangan_id')
-                                        <small class="invalid-feedback">
-                                            {{ $message }}
-                                        </small>
-                                    @enderror
-                                </div>
-
-                                <div class="col-md-6">
-                                    <fieldset class="form-group">
-                                        <label for="username" class="form-label">NPM</label>
-                                        <input type="text" name="username" id="username" class="form-control form-control-sm"
-                                            value="{{ $user->username }}" disabled>
-                                    </fieldset>
-                                </div>
-
-                            </div>
-
-                            <div class="row mt-2">
-                                <div class="col-md-6">
-                                    <fieldset class="form-group">
-                                        <label for="kegiatan" class="form-label">Kegiatan</label>
-                                        <input type="text" name="kegiatan" id="kegiatan" class="form-control form-control-sm" required
-                                            value="{{ old('kegiatan') }}">
-                                    </fieldset>
-                                </div>
-                                <div class="col-md-6">
-                                    <fieldset class="form-group">
-                                        <label for="no_telepon" class="form-label ">No Telepon</label>
-                                        <input type="text" name="no_telepon" id="no_telepon"
-                                            class="form-control form-control-sm numbers-only" required
-                                            value="{{ $user->no_telepon ?? '' }}">
-                                    </fieldset>
-                                </div>
-                            </div>
-
-                            <!-- Tombol untuk memunculkan modal -->
-                            <button type="button" class="btn btn-outline-azure btn-sm mt-3 mb-1" data-bs-toggle="modal"
-                                data-bs-target="#modalTambahBarang" id="btnTambahBarang">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-books">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path
-                                        d="M5 4m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" />
-                                    <path
-                                        d="M9 4m0 1a1 1 0 0 1 1 -1h2a1 1 0 0 1 1 1v14a1 1 0 0 1 -1 1h-2a1 1 0 0 1 -1 -1z" />
-                                    <path d="M5 8h4" />
-                                    <path d="M9 16h4" />
-                                    <path
-                                        d="M13.803 4.56l2.184 -.53c.562 -.135 1.133 .19 1.282 .732l3.695 13.418a1.02 1.02 0 0 1 -.634 1.219l-.133 .041l-2.184 .53c-.562 .135 -1.133 -.19 -1.282 -.732l-3.695 -13.418a1.02 1.02 0 0 1 .634 -1.219l.133 -.041z" />
-                                    <path d="M14 9l4 -1" />
-                                    <path d="M16 16l3.923 -.98" />
-                                </svg>
-                                Tambah Barang
-                            </button>
-
-                            <!-- Tabel daftar barang terpilih -->
-                            <div>
-                                <small class="text-danger">*Kosongkan Jika hanya ingin pinjam ruangan
-                                    saja</small>
-                            </div>
+                        </div>
+                        <div class="table-responsive">
                             <table class="table table-bordered" id="tabel-barang-terpilih">
                                 <thead>
                                     <tr>
@@ -163,13 +104,17 @@
                                         <th>Aksi</th>
                                     </tr>
                                 </thead>
-                                <tbody id="daftarBarang">
-
-                                </tbody>
+                                <tbody id="daftarBarang"></tbody>
                             </table>
+                        </div>
 
-                            <h3>List Approver</h3>
-                             {{-- Tabel untuk menampilkan Approver yang dipilih --}}
+
+                        <hr class="my-4">
+
+                        {{-- BAGIAN 4: ALUR PERSETUJUAN --}}
+                        <h4 class="mb-3">4. Alur Persetujuan</h4>
+                        <p class="text-muted">Daftar approver akan ditentukan secara otomatis oleh sistem berdasarkan aset yang Anda pinjam.</p>
+                        <div class="table-responsive">
                             <table class="table table-bordered" id="approver">
                                 <thead>
                                     <tr>
@@ -177,32 +122,29 @@
                                         <th>Bagian</th>
                                     </tr>
                                 </thead>
-                                <tbody id="table-list-approver">
-
-                                </tbody>
+                                <tbody id="table-list-approver"></tbody>
                             </table>
+                        </div>
+                    </div>
 
-                            <button type="submit" href="" class="btn btn-azure btn-sm mt-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                                    viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                                    stroke-linecap="round" stroke-linejoin="round"
-                                    class="icon icon-tabler icons-tabler-outline icon-tabler-device-floppy">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path d="M6 4h10l4 4v10a2 2 0 0 1 -2 2h-12a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2" />
-                                    <path d="M12 14m-2 0a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
-                                    <path d="M14 4l0 4l-6 0l0 -4" />
-                                </svg>
-                                Simpan
-                            </button>
-                        </form>
+                    {{-- FOOTER KARTU: TOMBOL AKSI --}}
+                    <div class="card-footer text-end">
+                        <a href="{{ route('home') }}" class="btn btn-secondary btn-sm">
+                            <i class="fa fa-arrow-left me-1"></i>
+                            Kembali
+                        </a>
+                        <button type="submit" class="btn btn-red btn-sm">
+                            <i class="fa fa-floppy-o me-1"></i>Simpan
+                        </button>
                     </div>
                 </div>
-            </div>
-
+            </form>
         </div>
-        {{-- Tempat Modal --}}
-        <div id="modalContainer"></div>
-    @endsection
+    </div>
+
+    {{-- Tempat Modal --}}
+    <div id="modalContainer"></div>
+@endsection
 
     @push('js')
         <script>

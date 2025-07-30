@@ -66,22 +66,17 @@
                                     </a>
                                 </div>
                             </div>
-                        </div>
-                        <div class="dropdown-menu show">
                             <div class="dropdown-menu-columns">
                                 <div class="dropdown-menu-column">
                                     <a class="dropdown-item" href="{{ route('admin.jadwal') }}">
-                                        Jadwal Ruangan
+                                        Jadwal Peminjaman
                                     </a>
                                 </div>
                             </div>
-                        </div>
-
-                        <div class="dropdown-menu show">
                             <div class="dropdown-menu-columns">
                                 <div class="dropdown-menu-column">
-                                    <a class="dropdown-item" href="{{ route('admin.jadwal') }}">
-                                        Jadwal Barang
+                                    <a class="dropdown-item" href="{{ route('admin.peminjaman.index') }}">
+                                        Riwayat Peminjaman
                                     </a>
                                 </div>
                             </div>

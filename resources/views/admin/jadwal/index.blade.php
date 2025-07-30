@@ -143,7 +143,6 @@
                             listContainer.innerText = '-';
                         }
                     }
-
                     // Menampilkan modal
                     var myModal = new bootstrap.Modal(document.getElementById('detailJadwal'), {
                         keyboard: false

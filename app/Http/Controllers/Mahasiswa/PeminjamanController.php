@@ -120,11 +120,7 @@ class PeminjamanController extends Controller
             // Persetujuan Kerumahtanggaan (Selalu ada)
             // Ambil data untuk mengisi id unit kerja Kerumahtanggan
             $kerumahtanggan = User::where('level', 'kerumahtanggaan')->firstOrFail();
-            PersetujuanPeminjaman::create([
-                'peminjaman_id' => $peminjamanBaru->id,
-                'status'        => 'menunggu',
-                'unitkerja_id'  => $kerumahtanggan->unitkerja_id
-            ]);
+            $unitKerjaIds[] = $kerumahtanggan->unitkerja_id;
 
             // Persetujuan BAAK (Berdasarkan unit kerja aset yang dipinjam, unik)
             $uniqueUnitKerjaIds = array_unique($unitKerjaIds);
