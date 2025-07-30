@@ -39,21 +39,19 @@
                                 </select>
                             </div>
                             {{-- INPUT HIDDEN USER ID (Diisi dari id user/peminjam yang dipilih) --}}
-                                <input type="hidden" name="user_id" id="user_id">
+                            <input type="hidden" name="user_id" id="user_id">
                             <div class="col-md-6 mb-3">
                                 <label for="prodi" class="form-label">Program Studi</label>
-                                        <input type="text" name="prodi" id="prodi" class="form-control" required
-                                            readonly>
+                                <input type="text" name="prodi" id="prodi" class="form-control" required readonly>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="username" class="form-label">NPM</label>
-                                        <input type="text" name="username" id="username"
-                                            class="form-control" disabled>
+                                <input type="text" name="username" id="username" class="form-control" disabled>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="no_telepon" class="form-label">No Telepon</label>
-                                        <input type="text" name="no_telepon" id="no_telepon"
-                                            class="form-control numbers-only" required>
+                                <input type="text" name="no_telepon" id="no_telepon" class="form-control numbers-only"
+                                    required>
                             </div>
                         </div>
 
@@ -237,9 +235,11 @@
                 }, function(res) {
                     if (res.available) {
                         // Panggil SweetAlert
-                        const message =
-                            "Ruangan sudah dibooking di hari dan jam yang sama. Silahkan pilih waktu lain atau ruangan lain.";
-                        sweetAlert(message);
+                        Swal.fire({
+                            title: "Info!",
+                            text: "Ruangan sudah dibooking di hari dan jam yang sama. Silahkan pilih waktu lain atau ruangan lain.",
+                            icon: "error"
+                        });
                         $('#ruangan_id').val('').trigger('change');
                     }
                 });

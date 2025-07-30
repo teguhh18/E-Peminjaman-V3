@@ -136,14 +136,12 @@ class PeminjamanController extends Controller
             // Jika semua proses di atas berhasil, commit transaksi
             DB::commit();
 
-            return redirect()->route('mahasiswa.peminjaman.index')->with('msg', 'Berhasil Membuat Pengajuan Peminjaman');
+            return redirect()->route('mahasiswa.peminjaman.index')->with(['msg' => 'Berhasil Membuat Pengajuan Peminjaman', 'class' => 'alert-success']);
         } catch (\Exception $e) {
             // Jika ada error di mana pun dalam blok 'try', batalkan semua
             DB::rollBack();
-
             Log::error('Gagal menyimpan peminjaman: ' . $e->getMessage());
-
-            return back()->with('msg', 'Terjadi kesalahan. Gagal Membuat Pengajuan Peminjaman.')->withInput();
+            return back()->with(['msg' => 'Terjadi Kesalahan. Gagal Membuat Pengajuan Peminjaman', 'class' => 'alert-danger'])->withInput();
         }
     }
 
@@ -401,7 +399,7 @@ class PeminjamanController extends Controller
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Gagal memperbarui peminjaman: ' . $e->getMessage());
-            return back()->with(['msg' => 'Terjadi Kesalahan, Mengubah Peminjaman', 'class' => 'alert-danger'])->withInput();
+            return back()->with(['msg' => 'Terjadi Kesalahan, Gagal Mengubah Peminjaman', 'class' => 'alert-danger'])->withInput();
         }
     }
 
