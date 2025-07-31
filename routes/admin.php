@@ -56,12 +56,16 @@ Route::middleware(['auth_admin'])->group(function () {
 
     // MODAL DELETE PEMINJAMAN
     Route::get('/master/booking/modal-delete/{id}', [BookingController::class, 'modalDelete'])->name('admin.booking.modal-delete');
+
+    
 });
 
 // ROUTE ADMIN DAN BAAK BISA AKSES (auth_baak)
 Route::middleware(['auth_baak'])->group(function () {
     // DASHBOARD
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    // DASHBOARD CARD PEMINJAMAN
+    Route::get('/admin/dashboard/filter-status', [DashboardController::class, 'filter_status'])->name('admin.dashboard.filter_status');
 
     // JADWAL PEMINJAMAN (FULLCALENDAR)
     Route::get('/master/jadwal', [JadwalController::class, 'index'])->name('admin.jadwal');

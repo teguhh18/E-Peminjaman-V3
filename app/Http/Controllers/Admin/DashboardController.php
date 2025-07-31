@@ -3,45 +3,56 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Barang;
 use App\Models\Peminjaman;
-use App\Models\PeminjamanRuangan;
+use App\Models\Ruangan;
 use Illuminate\Http\Request;
-use \DateTime;
+use Illuminate\Support\Str;
+use Illuminate\Http\JsonResponse; // Tambahkan di bagian atas controller
+use Illuminate\Support\Facades\Log;
+
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        // 
-        $title = "Halaman Home";
-        // dd(Auth::user()->level);
-        // $data = $this->menu();
-        $events = [];
+        $count_title = "Total Peminjaman";
+        $count = Peminjaman::count();
 
-        // $appointments = Peminjaman::with(['user', 'ruangan'])->where('konfirmasi', 2)->get(); //status 2 = sudah disetujui
-        // // dd($appointments);
+        $count_barang = Barang::count();
+        $count_ruangan = Ruangan::count();
 
-        // foreach ($appointments as $appointment) {
+        return view('admin.home.index', compact('count_title', 'count','count_barang','count_ruangan'));
+    }
 
-        //     $start = new DateTime($appointment->waktu_pinjam);
-        //     $end = new DateTime($appointment->waktu_selesai);
 
-        //     // Format waktu ke format ISO8601
-        //     $startIso = $start->format('Y-m-d\TH:i:s');
-        //     $endIso = $end->format('Y-m-d\TH:i:s');
+    public function filter_status(Request $request): JsonResponse
+    {
+          Log::info('Filter status called', $request->all());
+        // dd($request);
+        try {
+            // Ambil status, jika tidak ada, defaultnya adalah 'semua'
+            $status = $request->input('status', 'semua');
 
-        //     $events[] = [
-        //         'title' => $appointment->kegiatan . ' (' . $appointment->user->name . ') - ',
-        //         'start' => $startIso,
-        //         'end' => $endIso,
-        //     ];
-        // }
+            // Gunakan when() untuk query kondisional yang lebih bersih
+            $count = Peminjaman::query()
+                ->when($status !== 'semua', function ($query) use ($status) {
+                    return $query->where('status_peminjaman', $status);
+                })
+                ->count();
 
-        $halaman = 'admin.home.index';
-        return view($halaman, compact(
-            'title',
-            // 'data',
-            'events'
-        ));
+            // Buat judul yang lebih rapi
+            $count_title = ($status === 'semua')
+                ? 'semua'
+                : Str::ucfirst($status);
+
+            return response()->json([
+                'count_title' => $count_title,
+                'count' => $count,
+            ]);
+        } catch (\Exception $e) {
+            // Jika terjadi error, kirim respons error yang jelas
+            return response()->json(['message' => 'Gagal memuat data'], 500);
+        }
     }
 }

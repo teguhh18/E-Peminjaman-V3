@@ -1,100 +1,117 @@
 @extends('layouts.tabler-admin.master')
 @section('content')
     <div class="row row-cards">
-        {{-- <div class="col-sm-6 col-lg-6">
-            <div class="card card-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="bg-primary text-white avatar">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-netbeans"
-                                    width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5"
-                                    stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path
-                                        d="M19.875 6.27a2.225 2.225 0 0 1 1.125 1.948v7.284c0 .809 -.443 1.555 -1.158 1.948l-6.75 4.27a2.269 2.269 0 0 1 -2.184 0l-6.75 -4.27a2.225 2.225 0 0 1 -1.158 -1.948v-7.285c0 -.809 .443 -1.554 1.158 -1.947l6.75 -3.98a2.33 2.33 0 0 1 2.25 0l6.75 3.98h-.033z" />
-                                    <path
-                                        d="M15.5 9.43a1 1 0 0 1 .5 .874v3.268a1 1 0 0 1 -.515 .874l-3 1.917a1 1 0 0 1 -.97 0l-3 -1.917a1 1 0 0 1 -.515 -.873v-3.269a1 1 0 0 1 .514 -.874l3 -1.786c.311 -.173 .69 -.173 1 0l3 1.787h-.014z" />
-                                    <path d="M12 21v-9l-7.5 -4.5" />
-                                    <path d="M12 12l7.5 -4.5" />
-                                    <path d="M12 3v4.5" />
-                                    <path d="M19.5 16l-3.5 -2" />
-                                    <path d="M8 14l-3.5 2" />
-                                </svg>
-                            </span>
+        <div class="col-sm-12 col-md-6 col-lg-4">
+            {{-- Desain "Split Card" yang modern --}}
+            <div class="card h-100">
+                <div class="row g-0">
+                    {{-- Bagian Kiri: Panel Ikon dengan Gradien --}}
+                    <div class="col-3" style="background-image: linear-gradient(to bottom, #467fcf 0%, #2462c4 100%);">
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <i class="fa fa-tasks text-white" style="font-size: 2.5rem; opacity: 0.8;"></i>
                         </div>
-                        <div class="col">
-                            <div class="font-weight-medium">
-                                132 Sales
+                    </div>
+
+                    {{-- Bagian Kanan: Konten dan Data --}}
+                    <div class="col-9">
+                        <div class="card-body">
+                            {{-- Filter Dropdown di pojok kanan atas --}}
+                            <div class="d-flex justify-content-end">
+                                <div class="dropdown bg-azure">
+                                    <button type="button" class="btn btn-sm btn-ghost-secondary dropdown-toggle text-white"
+                                        data-bs-toggle="dropdown">
+                                        Filter Status
+                                    </button>
+                                    <div class="dropdown-menu dropdown-menu-end">
+                                        <a class="dropdown-item filter-status" href="#" data-status="semua">Semua</a>
+                                        <a class="dropdown-item filter-status" href="#"
+                                            data-status="menunggu">Menunggu</a>
+                                        <a class="dropdown-item filter-status" href="#"
+                                            data-status="disetujui">Disetujui</a>
+                                        <a class="dropdown-item filter-status" href="#" data-status="aktif">Aktif</a>
+                                        <a class="dropdown-item filter-status" href="#"
+                                            data-status="selesai">Selesai</a>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="text-secondary">
-                                Peminjaman Asset
-                            </div>
+
+                            {{-- Angka Utama (Fokus) --}}
+                            <div class="h1 fw-bold text-primary mb-0" id="status-count">{{ $count }}</div>
+
+                            {{-- Judul Dinamis --}}
+                            <div class="text-muted" id="status-title">{{ $count_title }}</div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
-        <div class="col-sm-6 col-lg-6">
-            <div class="card card-sm">
-                <div class="card-body">
-                    <div class="row align-items-center">
-                        <div class="col-auto">
-                            <span class="bg-primary text-white avatar">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-chalkboard"
-                                    width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5"
-                                    stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                                    <path
-                                        d="M8 19h-3a2 2 0 0 1 -2 -2v-10a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v11a1 1 0 0 1 -1 1" />
-                                    <path
-                                        d="M11 16m0 1a1 1 0 0 1 1 -1h4a1 1 0 0 1 1 1v1a1 1 0 0 1 -1 1h-4a1 1 0 0 1 -1 -1z" />
-                                </svg>
-                            </span>
+
+        <div class="col-sm-12 col-md-6 col-lg-4">
+            {{-- Desain "Split Card" yang modern --}}
+            <div class="card h-100">
+                <div class="row g-0">
+                    {{-- Bagian Kiri: Panel Ikon dengan Gradien --}}
+                    <div class="col-3" style="background-image: linear-gradient(to bottom, #467fcf 0%, #2462c4 100%);">
+                        <div class="d-flex align-items-center justify-content-center h-100">
+                            <i class="fa fa-cube text-white" style="font-size: 2.5rem; opacity: 0.8;"></i>
                         </div>
-                        <div class="col">
-                            <div class="font-weight-medium">
-                                132 Aktif
-                            </div>
-                            <div class="text-secondary">
-                                Peminjaman Ruangan
-                            </div>
+                    </div>
+
+                    {{-- Bagian Kanan: Konten dan Data --}}
+                    <div class="col-9">
+                        <div class="card-body">
+
+                            {{-- Angka Utama (Fokus) --}}
+                            <div class="h1 fw-bold text-primary mb-0" id="status-count">{{ $count_barang }}</div>
+
+                            {{-- Judul Dinamis --}}
+                            <div class="text-muted">Total Barang</div>
                         </div>
                     </div>
                 </div>
             </div>
-        </div> --}}
-    </div>
-
-    <div class="row mt-3">
-        <div class="col-md-12">
-            <meta name="csrf-token" content="{{ csrf_token() }}">
-            <div class="card">
-                <div class="card-header">Jadwal Penggunaan Ruangan</div>
-                <div class="card-body">
-                    <div id="calendar"></div>
-                </div>
-            </div>
-
         </div>
     </div>
 @endsection
+
 @push('js')
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            var calendarEl = document.getElementById('calendar');
-            var calendar = new FullCalendar.Calendar(calendarEl, {
-                initialView: 'dayGridMonth',
-                slotMinTime: '7:00:00',
-                slotMaxTime: '21:00:00',
-                events: @json($events),
-                headerToolbar: {
-                    left: 'prev,next today',
-                    center: 'title',
-                    right: 'dayGridMonth,timeGridWeek,timeGridDay'
-                },
+        $.ajaxSetup({
+            headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            }
+        });
+        $(document).ready(function() {
+            $(document).on("click", ".filter-status", function(e) {
+                e.preventDefault(); // Mencegah link '#' melompat ke atas halaman/url
+
+                // Gunakan .data() untuk mengambil atribut data-status
+                var status_filter = $(this).data("status");
+
+                const titleElement = $('#status-title');
+                const countElement = $('#status-count');
+
+                // Tampilkan status loading
+                titleElement.html('<i class="fa fa-spinner fa-spin"></i> Memuat...');
+                countElement.text('');
+
+                $.get("{{ route('admin.dashboard.filter_status') }}", {
+                    status: status_filter,
+                }, function(res) {
+                    // Format judul agar lebih rapi
+                    let titleText = res.count_title === 'semua' ?
+                        'Total Semua Peminjaman' :
+                        'Peminjaman ' + res.count_title;
+
+                    // Update tampilan kartu dengan data baru dari controller
+                    titleElement.text(titleText);
+                    countElement.text(res.count);
+
+                }).fail(function() {
+                    titleElement.text('Gagal memuat data');
+                    alert('Terjadi kesalahan saat mengambil data.');
+                });
             });
-            calendar.render();
         });
     </script>
 @endpush
