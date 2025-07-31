@@ -74,8 +74,9 @@ class PeminjamanController extends Controller
 
         // 2. Cek apakah minimal ada satu item (ruangan atau barang) yang dipilih
         if (!$request->filled('ruangan_id') && !$request->has('barang_id')) {
-            return back()->with('msg', 'Anda harus memilih minimal satu ruangan atau satu barang untuk dipinjam.');
+            return back()->with( ['msg' => 'Anda harus memilih minimal satu ruangan atau satu barang untuk dipinjam.', 'class' => 'alert-warning'])->withInput();
         }
+       
 
         // 3. Mulai Transaksi Database
         // memastikan semua data berhasil disimpan atau tidak sama sekali.
@@ -466,7 +467,7 @@ class PeminjamanController extends Controller
         //     ->where('peminjaman_id', $id)
         //     ->get();
         // dd($detailPeminjaman);
-        $view =  view('admin.booking.detail-barang', compact(
+        $view =  view('mahasiswa.peminjaman.detail-barang', compact(
             'title',
             'peminjaman',
             'detailPeminjaman'

@@ -65,7 +65,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/home', [HomeController::class, 'index'])->name('home');
 });
 
-Route::middleware(['auth_mahasiswa'])->group(function () {
+Route::middleware(['auth_mahasiswa','cek_profil'])->group(function () {
     // Peminjaman
     Route::get('/peminjaman/list-peminjaman', [PeminjamanController::class, 'list_peminjaman'])->name('mahasiswa.peminjaman.list-peminjaman');
     Route::get('/peminjaman/detail_barang/{id}', [PeminjamanController::class, 'detail_barang'])->name('mahasiswa.peminjaman.detail');

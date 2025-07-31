@@ -126,7 +126,7 @@ class HomeController extends Controller
         // Method update akan memperbarui semua data yang ada di dalam array $validatedData
         $dataUser->update($validatedData);
 
-        return redirect()->route('profil')->with('msg', 'Data Berhasil Diubah');
+        return redirect()->route('profil')->with(['msg' => 'Data Profil Berhasil Diubah', 'class' => 'alert-success']);
     }
 
     /**
@@ -207,6 +207,6 @@ class HomeController extends Controller
         $user->password = Hash::make($request->get('new_password'));
         $user->save();
 
-        return redirect()->back()->with("success", "Password changed successfully !");
+        return redirect()->back()->with(['msg' => 'Password Berhasil Diubah', 'class' => 'alert-success']);
     }
 }

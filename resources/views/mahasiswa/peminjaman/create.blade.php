@@ -5,7 +5,7 @@
             {{-- Notifikasi --}}
             <div id="respon">
                 @if (session()->has('msg'))
-                    <div class="alert {{ session('class') ?? 'alert-info' }} alert-dismissible" role="alert">
+                    <div class="alert alert-important {{ session('class') ?? 'alert-info' }} alert-dismissible" role="alert">
                         {{ session('msg') }}
                         <a class="btn-close" data-bs-dismiss="alert" aria-label="close"></a>
                     </div>

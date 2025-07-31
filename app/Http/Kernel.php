@@ -69,5 +69,6 @@ class Kernel extends HttpKernel
         'auth_baak' => \App\Http\Middleware\RedirectBasedOnRole::class, //custom authorisasi untuk baak dan admin
         'auth_admin' => \App\Http\Middleware\IsAuthAdmin::class, //custom authorisasi admin only
         'auth_mahasiswa' => \App\Http\Middleware\IsAuthMahasiswa::class, //custom authorisasi mahasiswa only
+        'cek_profil' => \App\Http\Middleware\CekProfilLengkap::class, // middleware untuk paksa isi no_telepon dan tanda_tangan di Halaman Profil
     ];
 }

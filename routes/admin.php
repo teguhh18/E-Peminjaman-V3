@@ -21,8 +21,6 @@ use App\Http\Controllers\Admin\UserController;
 
 // Route::get('/admin/dashboard', [DashboardController::class, 'index'])->middleware(['auth_admin'])->name('admin.dashboard');
 
-
-
 // Scan QR Code Peminjaman Ruangan
 Route::get('/scanPinjamRuangan', [ScanQRCodeController::class, 'index'])->middleware(['auth_baak'])->name('scan.pinjamRuangan');
 Route::get('/scanPinjamRuangan/checkId/{id}', [ScanQRCodeController::class, 'checkId'])->middleware(['auth_baak'])->name('scan.pinjamRuangan.checkId');

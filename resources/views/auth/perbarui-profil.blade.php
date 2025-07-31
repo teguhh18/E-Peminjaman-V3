@@ -23,7 +23,7 @@
                     @csrf
                     <div class="card-body">
                         @if (session('msg'))
-                            <div class="alert alert-success" role="alert">
+                            <div class="alert alert-important {{ session('class') }}" role="alert">
                                 {{ session('msg') }}
                             </div>
                         @endif
