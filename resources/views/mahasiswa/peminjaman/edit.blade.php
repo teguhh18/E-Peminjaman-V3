@@ -25,7 +25,8 @@
 
                     <div class="card-body">
                         {{-- BAGIAN 1: INFORMASI PEMINJAM (READ-ONLY) --}}
-                        <h4 class="mb-3">1. Informasi Peminjam<small class="text-muted"> (Sesuaikan di bagian profil)</small></h4>
+                        <h4 class="mb-3">1. Informasi Peminjam<small class="text-muted"> (Sesuaikan di bagian
+                                profil)</small></h4>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label class="form-label">Nama</label>
@@ -54,18 +55,21 @@
                         <div class="mb-3">
                             <label for="kegiatan" class="form-label required">Nama Kegiatan</label>
                             <input type="text" name="kegiatan" id="kegiatan" class="form-control" required
-                                value="{{ old('kegiatan', $peminjaman->kegiatan) }}" placeholder="Contoh: Rapat Koordinasi Himpunan">
+                                value="{{ old('kegiatan', $peminjaman->kegiatan) }}"
+                                placeholder="Contoh: Rapat Koordinasi Himpunan">
                         </div>
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="waktu_peminjaman" class="form-label required">Waktu Mulai</label>
                                 <input type="datetime-local" name="waktu_peminjaman" id="waktu_peminjaman"
-                                    class="form-control" required value="{{ old('waktu_peminjaman', $peminjaman->waktu_peminjaman) }}">
+                                    class="form-control" required
+                                    value="{{ old('waktu_peminjaman', $peminjaman->waktu_peminjaman) }}">
                             </div>
                             <div class="col-md-6 mb-3">
                                 <label for="waktu_pengembalian" class="form-label required">Waktu Selesai</label>
                                 <input type="datetime-local" name="waktu_pengembalian" id="waktu_pengembalian"
-                                    class="form-control" required value="{{ old('waktu_pengembalian', $peminjaman->waktu_pengembalian) }}">
+                                    class="form-control" required
+                                    value="{{ old('waktu_pengembalian', $peminjaman->waktu_pengembalian) }}">
                             </div>
                         </div>
 
@@ -79,11 +83,11 @@
                                 <select name="ruangan_id" id="ruangan_id" class="form-select">
                                     <option value="">- Tidak pinjam ruangan -</option>
                                     @foreach ($dataRuangan as $ruangan)
-                                            <option value="{{ $ruangan->id }}"
-                                                {{ $peminjaman->ruangan_id == $ruangan->id ? 'selected' : '' }}>
-                                                {{ $ruangan->kode_ruangan }} - {{ $ruangan->nama_ruangan }}
-                                            </option>
-                                        @endforeach
+                                        <option value="{{ $ruangan->id }}"
+                                            {{ $peminjaman->ruangan_id == $ruangan->id ? 'selected' : '' }}>
+                                            {{ $ruangan->kode_ruangan }} - {{ $ruangan->nama_ruangan }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
                             <div class="col-md-6 mb-3">
@@ -115,7 +119,8 @@
 
                         {{-- BAGIAN 4: ALUR PERSETUJUAN --}}
                         <h4 class="mb-3">4. Alur Persetujuan</h4>
-                        <p class="text-muted">Daftar approver akan ditentukan secara otomatis oleh sistem berdasarkan aset yang Anda pinjam.</p>
+                        <p class="text-muted">Daftar approver akan ditentukan secara otomatis oleh sistem berdasarkan aset
+                            yang Anda pinjam.</p>
                         <div class="table-responsive">
                             <table class="table table-bordered" id="approver">
                                 <thead>
@@ -148,285 +153,249 @@
     <div id="modalContainer"></div>
 @endsection
 
- @push('js')
-        <script>
-            // Mengatur batasan input date minimal 3 hari kedepan
-            document.addEventListener('DOMContentLoaded', function() {
-                // 1. Ambil elemen input date
-                const waktuPinjamInput = document.getElementById('waktu_peminjaman');
-                const waktuSelesaiInput = document.getElementById('waktu_pengembalian');
+@push('js')
+    <script>
+        $(document).ready(function() {
+            // ===================================================================
+            // 1. STATE & INISIALISASI AWAL
+            // ===================================================================
 
-                // --- Minimal hari ini, disable input dimasa lalu---
-                const minDate = new Date();
+            // Variabel untuk menyimpan state
+            let daftarBarang = @json($barangPeminjaman ?? []);
+            let listApprover = (@json($approvers ?? [])).map(approver => ({
+                ...approver,
+                is_manual: true
+            }));
+            let manuallyRemovedApprovers = [];
 
-                const year = minDate.getFullYear();
-                const month = String(minDate.getMonth() + 1).padStart(2, '0');
-                const day = String(minDate.getDate()).padStart(2, '0');
-                const minDateTimeString = `${year}-${month}-${day}T00:00`;
-
-                // Atur 'min' untuk KEDUA input saat halaman pertama kali dimuat
-                waktuPinjamInput.min = minDateTimeString;
-                waktuSelesaiInput.min = minDateTimeString;
+            // Setup CSRF token untuk semua request AJAX
+            $.ajaxSetup({
+                headers: {
+                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                }
             });
-        </script>
-        <script>
-            $(document).ready(function() {
-                // ===================================================================
-                // 1. STATE & INISIALISASI AWAL
-                // ===================================================================
 
-                let daftarBarang = @json($barangPeminjaman ?? []);
-                // let dataApprover = @json($approvers ?? []);
-                let listApprover = (@json($approvers ?? [])).map(approver => {
-                    approver.is_manual = true; // Tandai semua approver awal sebagai "manual"
-                    return approver;
+            // Inisialisasi Select2
+            $('#nama_id').select2({
+                placeholder: 'Pilih Opsi',
+                theme: 'bootstrap-5',
+                allowClear: true,
+                width: '100%'
+            });
+            $('#ruangan_id').select2({
+                placeholder: 'Pilih Opsi',
+                // theme: 'bootstrap-5',
+                allowClear: true,
+                width: '100%'
+            });
+
+            // Mengatur batasan input date
+            // --- Minimal 3 hari dari sekarang ---
+            const minDate = new Date();
+            minDate.setDate(new Date().getDate() + 3);
+
+            const year = minDate.getFullYear();
+            const month = String(minDate.getMonth() + 1).padStart(2, '0');
+            const day = String(minDate.getDate()).padStart(2, '0');
+            const minDateTimeString = `${year}-${month}-${day}T00:00`;
+            $('#waktu_peminjaman, #waktu_pengembalian').attr('min', minDateTimeString);
+
+            // Memuat data awal saat halaman dibuka
+            updateTabelBarang();
+            getAndUpdateApprovers();
+            const initialUserId = $('#nama_id').val();
+            if (initialUserId) {
+                fetchAndFillUserData(initialUserId);
+            }
+
+            // ===================================================================
+            // 2. EVENT HANDLERS (PENANGAN AKSI PENGGUNA)
+            // ===================================================================
+
+            // Update data user saat peminjam dipilih
+            $('#nama_id').on('change', function() {
+                fetchAndFillUserData($(this).val());
+            });
+
+            // Update approver saat ruangan atau waktu berubah
+            $('#ruangan_id, #waktu_peminjaman, #waktu_pengembalian').on('change', getAndUpdateApprovers);
+
+            // Buka modal untuk tambah barang
+            $(document).on("click", "#btnTambahBarang", handleModalBarang);
+
+            // Proses penambahan barang dari modal
+            $(document).on('submit', '#form-tambah-barang', handleTambahBarang);
+
+            // Hapus barang dari daftar
+            $(document).on('click', '.btn-hapus-barang', function() {
+                const barangId = $(this).data('id');
+                daftarBarang = daftarBarang.filter(item => item.id != barangId);
+                updateTabelBarang();
+                getAndUpdateApprovers();
+            });
+
+            // Buka modal untuk pilih approver
+            $(document).on("click", "#btnPilihApprover", handleModalApprover);
+            // ===================================================================
+            // 3. FUNGSI-FUNGSI BANTUAN (HELPER FUNCTIONS)
+            // ===================================================================
+
+            /** Menampilkan notifikasi error menggunakan SweetAlert */
+            function sweetAlert(message) {
+                Swal.fire({
+                    title: "Info!",
+                    text: message,
+                    icon: "error"
+                });
+            }
+
+            // --- Fungsi untuk Manajemen Barang ---
+
+            /** Menampilkan modal untuk menambah barang */
+            function handleModalBarang() {
+                $.get("{{ route('mahasiswa.peminjaman.modal-barang') }}")
+                    .done(function(data) {
+                        $('#modalContainer').html(data.html);
+                        const modalEl = $('#modalTambahBarang');
+                        modalEl.modal('show');
+
+                        $('#barang_id').select2({
+                            placeholder: 'Pilih Barang',
+                            allowClear: true,
+                            dropdownParent: modalEl,
+                            theme: 'bootstrap-5',
+                            width: '100%',
+                        }).on('change', cekKetersediaanBarang);
+
+                        // Gunakan event handler jQuery yang konsisten untuk membersihkan modal
+                        modalEl.on('hidden.bs.modal', function() {
+                            $(this).remove();
+                        });
+                    });
+            }
+
+            /** Memvalidasi dan menambah barang ke `daftarBarang` */
+            function handleTambahBarang(e) {
+                e.preventDefault();
+                const barangId = $('#barang_id').val();
+                const barangText = $('#barang_id option:selected').text();
+                const jumlah = parseInt($('#jumlah').val());
+
+                if (!barangId || !jumlah || jumlah < 1) {
+                    return sweetAlert("Barang dan jumlah wajib diisi!");
+                }
+                if (daftarBarang.some(item => item.id == barangId)) {
+                    return sweetAlert("Barang sudah ditambahkan!");
+                }
+
+                daftarBarang.push({
+                    id: barangId,
+                    nama: barangText,
+                    jumlah: jumlah,
+                    barang_id: barangId,
+                    jumlah_barang: jumlah
                 });
                 updateTabelBarang();
-                // Fungsi untuk merender tabel barang dan approver dengan data awal
                 getAndUpdateApprovers();
+                // Tutup modal
+                $('#modalTambahBarang').modal('hide');
+            }
 
-                $.ajaxSetup({
-                    headers: {
-                        'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
-                    }
-                });
-
-                // Inisialisasi Select2 untuk elemen yang sudah ada di halaman
-                $('#ruangan_id').select2({
-                    placeholder: 'Pilih',
-                    // theme: 'bootstrap-5',
-                    allowClear: true,
-                    with: '100%'
-                });
-
-                // 2. EVENT HANDLERS (PENANGAN AKSI PENGGUNA)
-                // Perbarui daftar approver saat ada perubahan ruangan
-                $('#ruangan_id').on('change', getAndUpdateApprovers);
-
-                // -- Manajemen Barang --
-                $(document).on("click", "#btnTambahBarang", handleModalBarang);
-                $(document).on('submit', '#form-tambah-barang', handleTambahBarang);
-                $(document).on('click', '.btn-hapus-barang', function() {
-                    const barangId = $(this).data('id');
-                    daftarBarang = daftarBarang.filter(item => item.id != barangId);
-                    updateTabelBarang();
-                    getAndUpdateApprovers();
-                });
-
-                // -- Manajemen Approver --
-                $(document).on("click", "#btnPilihApprover", handleModalApprover);
-                $(document).on('click', '.btn-hapus-approver', function() {
-                    const approverId = parseInt($(this).data('id'));
-                    listApprover = listApprover.filter(item => parseInt(item.id) !== approverId);
-                    getAndUpdateApprovers();
-                });
-
-                // ===================================================================
-                // 3. FUNGSI-FUNGSI BANTUAN (HELPER FUNCTIONS)
-                // ===================================================================
-
-                // --- Fungsi untuk Barang ---
-                function handleModalBarang() {
-                    $.ajax({
-                            url: "{{ route('mahasiswa.peminjaman.modal-barang') }}",
-                            method: 'GET',
-                        })
-                        .done(function(data) {
-                            $('#modalContainer').html(data.html);
-                            const modalEl = document.getElementById('modalTambahBarang');
-                            // Buat instance baru setiap kali, dan biarkan Bootstrap menanganinya.
-                            const myModal = new bootstrap.Modal(modalEl);
-                            myModal.show();
-
-                            // Dengarkan event 'hidden.bs.modal' untuk membersihkan DOM setelah modal tertutup
-                            modalEl.addEventListener('hidden.bs.modal', event => {
-                                // Hapus elemen modal dari DOM untuk mencegah duplikasi
-                                $(modalEl).remove();
-                            });
-
-                            // Select2 untuk pilih barang di modal
-                            $('#barang_id').select2({
-                                placeholder: 'Pilih Barang',
-                                allowClear: true,
-                                dropdownParent: $('#modalTambahBarang'),
-                                theme: 'bootstrap-5',
-                                width: '100%',
-                            });
-
-                            // // Atur max jumlah berdasarkan stok barang
-                            $('#barang_id').on('change', function() {
-                                const id = $(this).val();
-                                const mulai = $('#waktu_peminjaman').val();
-                                const sampai = $('#waktu_pengembalian').val();
-                                const jumlahInput = $('#jumlah'); // Simpan elemen input jumlah
-                                if (!id) return;
-
-                                $.get("{{ route('cek.ketersediaan.barang') }}", {
-                                    barang_id: id,
-                                    waktu_peminjaman: mulai,
-                                    waktu_pengembalian: sampai
-                                }, function(res) {
-                                    jumlahInput.prop('disabled', false);
-                                    // Atur batas maksimal input jumlah sesuai stok tersedia
-                                    if (res.stok_tersedia < 1) {
-                                        // Panggil SweetAlert
-                                        const message =
-                                            "Stok Tidak Tersedia/Habis Untuk Hari dan Jam yang Kamu Pilih";
-                                        sweetAlert(message);
-                                    }
-                                    jumlahInput.attr('max', res.stok_tersedia);
-
-                                    // Beri placeholder sesuai stok yang tersedia
-                                    jumlahInput.attr('placeholder',
-                                        `Maksimal ${res.stok_tersedia} unit`);
-
-
-                                }).fail(function() {
-                                    jumlahInput.prop('disabled', false);
-                                    // Panggil SweetAlert
-                                    const message =
-                                        "Gagal mengecek ketersediaan barang, Pilih Hari dan Jam Terlebih Dahulu";
-                                    sweetAlert(message);
-                                });
-                            });
-
-
-                        })
-                }
-
-                function handleTambahBarang(e) {
-                    e.preventDefault();
-                    const barangId = $('#barang_id').val(); // value id barang dari barang yang dipilih
-                    const barangText = $('#barang_id option:selected').text();
-                    const jumlah = parseInt($('#jumlah').val());
-
-                    // form modal tidak boleh ada yang kosong
-                    if (!barangId || !jumlah || jumlah < 1) {
-                        // Panggil SweetAlert
-                        const message = "Barang dan jumlah wajib diisi!";
-                        sweetAlert(message);
-                    }
-
-                    // Cek duplikat data/ apakah barang sudah ditambahkan
-                    if (daftarBarang.some(item => item.id == barangId)) {
-                        // Panggil SweetAlert
-                        Swal.fire({
-                            title: "Info!",
-                            text: "Barang sudah ditambahkan!",
-                            icon: "error"
-                        });
-                        return;
-                    }
-
-                    // Tambahkan ke array & tampilkan ke tabel
-                    daftarBarang.push({
-                        id: barangId,
-                        nama: barangText,
-                        jumlah: jumlah
-                    });
-
-                    updateTabelBarang(); // panggi fungsi updateTabelBarang
-                    getAndUpdateApprovers(); // panggi fungsi updateTabelApprover
-
-                    // Reset/kosongkan input modal
-                    $('#barang_id').val('').trigger('change');
-                    $('#jumlah').val('');
-
-                    // tutup modal
-                    const modalEl = document.getElementById('modalTambahBarang');
-                    const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                    // Cukup panggil hide(), biarkan Bootstrap mengurus backdrop
-                    if (modalInstance) {
-                        modalInstance.hide();
-                    }
-                }
-
-                function updateTabelBarang() {
-                    let html = '';
-                    daftarBarang.forEach((item, index) => {
-                        html += `
+            /** Merender ulang tabel daftar barang */
+            function updateTabelBarang() {
+                let html = '';
+                daftarBarang.forEach((item, index) => {
+                    html += `
                 <tr>
                     <td>${index + 1}</td>
-                    <td>${item.nama}<input type="hidden" id="barang_id[]" name="barang_id[]" value="${item.id}"></td>
-                    <td>${item.jumlah}<input type="hidden" name="jumlah_barang[]" value="${item.jumlah}"></td>
+                    <td>${item.nama}<input type="hidden" name="barang_id[]" value="${item.barang_id || item.id}"></td>
+                    <td>${item.jumlah}<input type="hidden" name="jumlah_barang[]" value="${item.jumlah_barang || item.jumlah}"></td>
                     <td><button type="button" class="btn btn-danger btn-sm btn-hapus-barang" data-id="${item.id}">Hapus</button></td>
                 </tr>`;
-                    });
-                    $('#daftarBarang').html(html);
+                });
+                $('#daftarBarang').html(html);
+            }
+
+            /** Mengecek ketersediaan stok barang pada tanggal yang dipilih */
+            function cekKetersediaanBarang() {
+                const id = $('#barang_id').val();
+                const mulai = $('#waktu_peminjaman').val();
+                const sampai = $('#waktu_pengembalian').val();
+                const jumlahInput = $('#jumlah');
+
+                if (!id || !mulai || !sampai) {
+                    jumlahInput.prop('disabled', true).attr('placeholder', 'Pilih waktu & barang');
+                    if (id && (!mulai || !sampai)) sweetAlert("Pilih waktu peminjaman terlebih dahulu.");
+                    return;
                 }
 
-                // --- Fungsi untuk Approver ---
-                function handleModalApprover() {
-                    $.get("{{ route('admin.peminjaman.modal-approver') }}")
-                        .done(function(data) {
-                            $('#modalContainer').html(data.html);
-                            $('#modalPilihApprover').modal('show');
-                            $('#approver_id').select2({
-                                dropdownParent: $('#modalPilihApprover'),
-                                theme: 'bootstrap-5'
+                $.get("{{ route('cek.ketersediaan.barang') }}", {
+                        barang_id: id,
+                        waktu_peminjaman: mulai,
+                        waktu_pengembalian: sampai
+                    })
+                    .done(function(res) {
+                        jumlahInput.prop('disabled', false).attr('max', res.stok_tersedia);
+                        jumlahInput.attr('placeholder', `Maks. ${res.stok_tersedia} unit`);
+                        if (res.stok_tersedia < 1) {
+                            sweetAlert("Stok tidak tersedia pada waktu yang dipilih.");
+                            jumlahInput.prop('disabled', true);
+                        }
+                    })
+                    .fail(() => sweetAlert("Gagal mengecek ketersediaan barang."));
+            }
+
+            // --- Fungsi untuk Manajemen Approver ---
+
+            /** Mengambil saran approver dari server dan memperbarui daftar */
+            function getAndUpdateApprovers() {
+                const ruanganId = $('#ruangan_id').val();
+                const barangIds = daftarBarang.map(item => item.id);
+                const mulai = $('#waktu_peminjaman').val();
+                const sampai = $('#waktu_pengembalian').val();
+
+                if (!ruanganId && barangIds.length === 0) {
+                    listApprover = listApprover.filter(approver => approver.is_manual === true);
+                    renderTabelApprover();
+                    return;
+                }
+
+                $.get("{{ route('mahasiswa.peminjaman.list-approver') }}", {
+                    ruangan_id: ruanganId,
+                    barang_id: barangIds,
+                    waktu_peminjaman: mulai,
+                    waktu_pengembalian: sampai
+                }).done(function(res) {
+                    const suggestions = res.approvers;
+                    listApprover = listApprover.filter(approver => approver.is_manual === true);
+
+                    suggestions.forEach(suggestion => {
+                        const isInList = listApprover.some(item => item.id == suggestion.id);
+                        const wasRemoved = manuallyRemovedApprovers.includes(parseInt(suggestion
+                            .id));
+                        if (!isInList && !wasRemoved) {
+                            listApprover.push({
+                                ...suggestion,
+                                is_manual: false
                             });
-                        });
-                }
-
-                let manuallyRemovedApprovers = [];
-
-                function getAndUpdateApprovers() {
-                    const ruanganId = $('#ruangan_id').val();
-                    const barangIds = daftarBarang.map(item => item.id);
-
-                    // Ambil saran approver dari server
-                    $.get("{{ route('mahasiswa.peminjaman.list-approver') }}", {
-                        ruangan_id: ruanganId,
-                        barang_id: barangIds,
-                    }).done(function(res) {
-                        const suggestions = res.approvers;
-
-                        // 1. Hapus saran sistem yang lama, TAPI pertahankan yang ditambah manual
-                        listApprover = listApprover.filter(approver => approver.is_manual === true);
-
-                        // 2. Gabungkan dengan saran baru dari server, hindari duplikasi & yang sudah dihapus manual
-                        suggestions.forEach(suggestion => {
-                            const isAlreadyInList = listApprover.some(item => item.id == suggestion.id);
-                            const wasManuallyRemoved = manuallyRemovedApprovers.includes(parseInt(
-                                suggestion.id));
-
-                            if (!isAlreadyInList && !wasManuallyRemoved) {
-                                suggestion.is_manual = false; // Tandai sebagai saran sistem
-                                listApprover.push(suggestion);
-                            }
-                        });
-
-                        // 3. Render ulang tabel dengan daftar yang sudah diperbarui
-                        renderTabelApprover();
+                        }
                     });
-                }
+                    renderTabelApprover();
+                });
+            }
 
-                function renderTabelApprover() {
-                    let html = '';
-                    listApprover.forEach((item, index) => {
-                        html += `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>
-                                ${item.nama}
-                                <input type="hidden" name="approver_id[]" value="${item.id}">
-                            </td>
-                        </tr>`;
-                    });
-                    $('#list-approver').html(html);
-                }
-
-
-                // Fungsi untuk SweetAlert
-                function sweetAlert(message) {
-                    const alert = Swal.fire({
-                        title: "Info!",
-                        text: message,
-                        icon: "error"
-                    });
-                    return alert
-                }
-            });
-        </script>
-    @endpush
-
+            /** Merender ulang tabel daftar approver */
+            function renderTabelApprover() {
+                let html = '';
+                listApprover.forEach((item, index) => {
+                    html += `
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${item.nama}<input type="hidden" name="approver_id[]" value="${item.id}"></td>
+                </tr>`;
+                });
+                $('#list-approver').html(html);
+            }
+        });
+    </script>
+@endpush
