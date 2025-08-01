@@ -173,7 +173,7 @@
                                         {{ $message }}
                                     </small>
                                 @enderror
-                                <img class="img-preview img-fluid mb-3" width="250px">
+                                <img class="img-preview img-fluid mt-2" width="250px">
                             </div>
                         </div>
 

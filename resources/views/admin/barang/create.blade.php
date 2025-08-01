@@ -29,7 +29,7 @@
                         <div class="row">
                             <div class="col-md-6 mb-2">
                                 <label for="kode" class="form-label">Kode Barang</label>
-                                <input type="text" class="form-control form-control-sm @error('kode') is-invalid @enderror"
+                                <input type="text" class="form-control @error('kode') is-invalid @enderror"
                                     id="kode" name="kode" placeholder="Kode Barang"
                                     value="{{ old('kode', $newKode) }}" required>
                                 @error('kode')
@@ -41,7 +41,7 @@
                             </div>
                             <div class="col-md-6 mb-2 ">
                                 <label for="nama" class=" form-label">Nama Barang</label>
-                                <input type="text" class="form-control form-control-sm @error('nama') is-invalid @enderror"
+                                <input type="text" class="form-control @error('nama') is-invalid @enderror"
                                     id="nama" name="nama" placeholder="Nama Barang" value="{{ old('nama') }}"
                                     required>
                                 @error('nama')
@@ -51,10 +51,10 @@
                                 @enderror
                             </div>
 
-                            <div class="col-md-6 mb-2 ">
+                            {{-- <div class="col-md-6 mb-2 ">
                                 <label for="kategori_id" class="form-label">Kategori</label>
                                 <select name="kategori_id" id="kategori_id"
-                                    class="form-control form-control-sm @error('kategori_id') is-invalid @enderror">
+                                    class="form-control @error('kategori_id') is-invalid @enderror">
                                     <option value="">-Kategori-</option>
                                     @foreach ($kategoris as $kat)
                                         <option value="{{ $kat->id }}"
@@ -67,10 +67,10 @@
                                         {{ $message }}
                                     </small>
                                 @enderror
-                            </div>
+                            </div> --}}
                             {{-- <div class="col-md-6 mb-2 ">
                                 <label for="tgl_perolehan" class="form-label">Tanggal Perolehan</label>
-                                <input type="text" class="form-control form-control-sm @error('tgl_perolehan') is-invalid @enderror"
+                                <input type="text" class="form-control @error('tgl_perolehan') is-invalid @enderror"
                                     id="tgl_perolehan" name="tgl_perolehan" placeholder="Tanggal Perolehan" required
                                     value="{{ old('tgl_perolehan', date('m/d/Y')) }}" autocomplete="off">
                                 @error('tgl_perolehan')
@@ -82,7 +82,7 @@
                             <div class="col-md-6 mb-2 ">
                                 <label for="ruangan_id" class="form-label">Tempat</label>
                                 <select name="ruangan_id" id="ruangan_id" style="padding: 9px 12px !important"
-                                    class="form-control form-control-sm js-example-basic-single  @error('ruangan_id') is-invalid @enderror"
+                                    class="form-control js-example-basic-single  @error('ruangan_id') is-invalid @enderror"
                                     width="100%">
                                     <option value="">-Pilih Ruangan-</option>
                                     @php
@@ -115,11 +115,16 @@
                                 @enderror
                             </div>
                             <div class="col-md-6 mb-2 ">
-                                <label for="penanggung_jawab" class="form-label">Penanggung Jawab</label>
-                                <input type="text" class="form-control form-control-sm @error('penanggung_jawab') is-invalid @enderror"
-                                    id="penanggung_jawab" name="penanggung_jawab" placeholder="Penanggung Jawab"
-                                    value="{{ old('penanggung_jawab') }}">
-                                @error('penanggung_jawab')
+                                <label for="penanggung_jawab" class="form-label">Penanggung Jawab/Unit Kerja</label>
+                                <select name="unitkerja_id" id="unitkerja_id"
+                                    class="form-control @error('unitkerja_id') is-invalid @enderror">
+                                    <option value="">-Pilih-</option>
+                                    @foreach ($unitkerjas as $uk)
+                                        <option value="{{ $uk->id }}">{{ $uk->kode }} - {{ $uk->nama }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                                @error('unitkerja_id')
                                     <small class="invalid-feedback">
                                         {{ $message }}
                                     </small>
@@ -128,14 +133,14 @@
 
                             {{-- <div class="col-md-6 mb-2 ">
                                 <label for="harga_perolehan" class=" form-label">Harga Barang</label>
-                                <input type="number" class="form-control form-control-sm @error('harga_perolehan') is-invalid @enderror"
+                                <input type="number" class="form-control @error('harga_perolehan') is-invalid @enderror"
                                     id="harga_perolehan" name="harga_perolehan" placeholder="Harga Barang"
                                     value="{{ old('harga_perolehan') }}">
                             </div> --}}
 
                             <div class="col-md-6 mb-2 ">
                                 <label for="jumlah" class="form-label">Jumlah</label>
-                                <input type="text" class="form-control form-control-sm @error('jumlah') is-invalid @enderror"
+                                <input type="text" class="form-control @error('jumlah') is-invalid @enderror"
                                     id="jumlah" name="jumlah" placeholder="Jumlah Aset" value="{{ old('jumlah') }}">
                                 @error('jumlah')
                                     <small class="invalid-feedback">
@@ -147,8 +152,8 @@
                             <div class="col-md-6 mb-2 ">
                                 <label for="kondisi" class=" form-label">Kondisi</label>
                                 <select name="kondisi" id="kondisi"
-                                    class="form-control form-control-sm @error('kondisi') is-invalid @enderror">
-                                    <option value="">-Kondisi Ruangan-</option>
+                                    class="form-control @error('kondisi') is-invalid @enderror">
+                                    <option value="">-Kondisi Barang-</option>
                                     <option value="1" {{ 1 == old('kondisi') ? 'selected' : '' }}>Baik
                                     </option>
                                     <option value="2" {{ 2 == old('kondisi') ? 'selected' : '' }}>Rusak
@@ -165,7 +170,7 @@
                             <div class="col-md-6 mb-2 ">
                                 <label for="status" class=" form-label">Status</label>
                                 <select name="status" id="status"
-                                    class="form-control form-control-sm @error('status') is-invalid @enderror">
+                                    class="form-control @error('status') is-invalid @enderror">
                                     <option value="">-Pilih Status-</option>
                                     <option value="1" {{ 1 == old('status') ? 'selected' : '' }}>Aktif
                                     </option>
@@ -180,11 +185,25 @@
                                     </small>
                                 @enderror
                             </div>
+                            <div class="col-md-6 mb-2 ">
+                                <label for="bisa_pinjam" class=" form-label">Bisa Pinjam</label>
+                                <select name="bisa_pinjam" id="bisa_pinjam"
+                                    class="form-control @error('bisa_pinjam') is-invalid @enderror">
+                                    <option value="">-Pilih-</option>
+                                    <option value="1">Bisa</option>
+                                    <option value="0">Tidak</option>
+                                </select>
+                                @error('bisa_pinjam')
+                                    <small class="invalid-feedback">
+                                        {{ $message }}
+                                    </small>
+                                @enderror
+                            </div>
 
                             {{-- <div class="col-md-6 mb-2 ">
                                 <label for="deskripsi" class=" form-label">Deskripsi</label>
                                 <textarea name="deskripsi" id="deskripsi" cols="30" rows="5"
-                                    class="form-control form-control-sm @error('deskripsi') is-invalid @enderror"></textarea>
+                                    class="form-control @error('deskripsi') is-invalid @enderror"></textarea>
                                 @error('deskripsi')
                                     <small class="invalid-feedback">
                                         {{ $message }}
@@ -194,7 +213,7 @@
                             <div class="col-md-6 mb-2 ">
                                 <label for="foto" class="form-label">Foto Barang</label>
                                 <input type="file" id="success-input-4"
-                                    class="form-control form-control-sm @error('foto') is-invalid @enderror" name="foto"
+                                    class="form-control @error('foto') is-invalid @enderror" name="foto"
                                     accept="image/*" onchange="previewImage()">
 
                                 @error('foto')
@@ -242,7 +261,9 @@
             }
 
             $(document).ready(function() {
-                $('.js-example-basic-single').select2();
+                $('.js-example-basic-single').select2({
+                    theme: 'bootstrap-5'
+                });
             });
         </script>
     @endpush

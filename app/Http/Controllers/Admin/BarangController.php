@@ -10,6 +10,7 @@ use App\Models\Ruangan;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use App\Exports\BarangExport;
+use App\Models\Unitkerja;
 use Excel;
 // use Maatwebsite\Excel\Excel;
 
@@ -44,6 +45,7 @@ class BarangController extends Controller
         $title = "Tambah Data Barang";
         $ruangans = Ruangan::with('gedung')->get();
         $kategoris = Kategori::all();
+        $unitkerjas = Unitkerja::all();
         $lastBarang = Barang::orderBy('kode', 'desc')->first();
         if ($lastBarang) {
             $lastNumber = intval(substr($lastBarang->kode, 2)); // Mengambil angka dari kode, misal '0001'
@@ -57,7 +59,8 @@ class BarangController extends Controller
             'title',
             'ruangans',
             'newKode',
-            'kategoris'
+            'kategoris',
+            'unitkerjas',
         ));
     }
 
@@ -75,14 +78,15 @@ class BarangController extends Controller
         $validatedData  = $request->validate([
             'nama'     => 'required|max:255',
             'kode'     => 'required|unique:gedungs',
-            "kategori_id" => 'required',
+            // "kategori_id" => 'required',
             "tgl_perolehan" => '',
             "ruangan_id" => 'required',
-            "penanggung_jawab" => '',
+            "unitkerja_id" => '',
             "harga_perolehan" => '',
             "jumlah" => '',
             "kondisi" => '',
             "status" => '',
+            "bisa_pinjam" => 'required',
             "deskripsi" => '',
             'foto' => 'image|file|max:2048',
         ]);
@@ -126,11 +130,14 @@ class BarangController extends Controller
         $ruangans = Ruangan::with('gedung')->get();
         $dataBarang = Barang::where('id', $id)->first();
         $kategoris = Kategori::all();
+        $unitkerjas = Unitkerja::all();
+
         return  view('admin.barang.update', compact(
             'title',
             'dataBarang',
             'ruangans',
-            'kategoris'
+            'kategoris',
+            'unitkerjas'
         ));
     }
 
@@ -151,7 +158,7 @@ class BarangController extends Controller
             "kategori_id" => '',
             "tgl_perolehan" => '',
             "ruangan_id" => 'required',
-            "penanggung_jawab" => '',
+            "unitkerja_id" => '',
             "harga_perolehan" => '',
             "jumlah" => '',
             "kondisi" => '',

@@ -4,7 +4,7 @@
         <div class="col-md-12">
             <div id="respon">
                 @if (session()->has('msg'))
-                    <div class="alert  alert-important alert-{{ session('class') }} alert-dismissible" role="alert">
+                    <div class="alert  alert-important {{ session('class') }} alert-dismissible" role="alert">
                         <div class="d-flex">
                             <div>
                                 <i class="fa fa-info"></i>

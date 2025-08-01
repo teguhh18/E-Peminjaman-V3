@@ -16,7 +16,7 @@
                 <div class="card-body">
                     <div id="respon">
                         @if (session()->has('msg'))
-                            <div class="alert alert-important alert-{{ session('class') }} alert-dismissible"
+                            <div class="alert alert-important {{ session('class') }} alert-dismissible"
                                 role="alert">
                                 <div class="d-flex">
                                     <div></div>

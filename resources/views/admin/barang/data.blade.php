@@ -3,8 +3,8 @@
     <div class="row">
         <div id="respon">
             @if (session()->has('msg'))
-                <div class="alert {{ session('class') }} alert-dark">
-                    <button type="button" class="close" data-dismiss="alert">×</button>
+                <div class="alert {{ session('class') }} alert-important">
+                    {{-- <button type="button" class="close" data-dismiss="alert">×</button> --}}
                     {{ session('msg') }}
                 </div>
             @endif
