@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Barang;
 use App\Models\Peminjaman;
 use App\Models\Ruangan;
+use App\Models\Unitkerja;
 use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\Log;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $count_title = "Total Peminjaman";
         $count = Peminjaman::count();
@@ -23,16 +24,34 @@ class DashboardController extends Controller
         $count_barang = Barang::count();
         $count_ruangan = Ruangan::count();
 
-        $events = [];
-        $ruangan = Ruangan::all();
-        if (isset($request->ruangan_id)) {
-            $appointments = Peminjaman::with(['user', 'ruangan', 'detail_peminjaman.barang'])->whereIn('status_peminjaman', ['disetujui', 'aktif', 'dikembalikan'])->where('ruangan_id', $request->ruangan_id)->get();
 
-            $ruangan_id = $request->ruangan_id;
-        } else {
-            $appointments = Peminjaman::with(['user', 'ruangan', 'detail_peminjaman.barang'])->whereIn('status_peminjaman', ['disetujui', 'aktif', 'dikembalikan'])->get();
-            $ruangan_id = null;
+        // UNTUK JADWAL FULLCALENDAR
+        $events = [];
+        // $ruangan = Ruangan::all();
+        $unitkerja = Unitkerja::all();
+
+        // Ambil unitkerja_id dari request
+        $unitkerja_id = $request->unitkerja_id;
+
+        // Mulai query dasar
+        $query = Peminjaman::with(['user', 'ruangan', 'detail_peminjaman.barang'])
+            ->whereIn('status_peminjaman', ['disetujui', 'aktif']);
+        if (isset($request->unitkerja_id)) {
+            $query->where(function ($subQuery) use ($unitkerja_id) {
+                // Cari peminjaman yang ruangannya milik unit kerja ini
+                $subQuery->whereHas('ruangan', function ($q) use ($unitkerja_id) {
+                    $q->where('unitkerja_id', $unitkerja_id);
+                })
+                    // ATAU cari peminjaman yang salah satu barangnya milik unit kerja ini
+                    ->orWhereHas('detail_peminjaman.barang', function ($q) use ($unitkerja_id) {
+                        $q->where('unitkerja_id', $unitkerja_id);
+                    });
+            });
+
+            $unitkerja_id = $request->unitkerja_id;
         }
+        // Eksekusi query
+        $appointments = $query->get();
 
         foreach ($appointments as $appointment) {
 
@@ -55,7 +74,7 @@ class DashboardController extends Controller
             ];
         }
 
-        return view('admin.home.index', compact('count_title', 'count', 'count_barang', 'count_ruangan','events', 'ruangan', 'ruangan_id'));
+        return view('admin.home.index', compact('count_title', 'count', 'count_barang', 'count_ruangan', 'events', 'unitkerja', 'unitkerja_id'));
     }
 
 

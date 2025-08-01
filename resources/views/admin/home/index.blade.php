@@ -100,43 +100,66 @@
     </div>
 
     <div class="card mt-3">
-        <div class="card-header">
-            <h2>
+        <div class="card-header d-flex justify-content-between align-items-center">
+            {{-- Judul di sisi kiri --}}
+            <h3 class="card-title mb-0">
                 Jadwal Peminjaman Disetujui & Aktif
-            </h2>
+            </h3>
+
+            {{-- Filter di sisi kanan --}}
+            <div class="card-actions">
+                <form method="get" class="d-flex gap-2 align-items-center">
+                    {{-- Select yang lebih ringkas --}}
+                    <select name="unitkerja_id" id="unitkerja_id" class="form-select form-select-sm"
+                        aria-label="Pilih Unit Kerja">
+                        <option value="">- Semua Unit Kerja -</option>
+                        @foreach ($unitkerja as $key)
+                            <option value="{{ $key->id }}" {{ request('unitkerja_id') == $key->id ? 'selected' : '' }}>
+                                {{ $key->nama }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    {{-- Tombol Filter --}}
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="fa fa-filter me-1"></i>Filter
+                    </button>
+                </form>
+            </div>
         </div>
+
         <div class="card-body">
             <div id="calendar"></div>
         </div>
     </div>
 
     {{-- MODAL DETAIL JADWAL/EVENT --}}
-        <div class="modal fade" id="detailJadwal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="modalTitle">Detail Acara</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div id="modalBody">
-                            <p><strong>Nama:</strong> <span id="nama"></span></p>
-                            <p><strong>Ruangan:</strong> <span id="ruangan"></span></p>
-                            <p><strong>Mulai:</strong> <span id="eventStart"></span></p>
-                            <p><strong>Selesai:</strong> <span id="eventEnd"></span></p>
-                            <div>
-                                <strong>Barang:</strong>
-                                <ul id="daftar-barang" style="margin-top: 5px; padding-left: 20px;">
-                                </ul>
-                            </div>
+    <div class="modal fade" id="detailJadwal" tabindex="-1" aria-labelledby="modalTitle" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="modalTitle">Detail Acara</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="modalBody">
+                        <p><strong>Nama:</strong> <span id="nama"></span></p>
+                        <p><strong>Ruangan:</strong> <span id="ruangan"></span></p>
+                        <p><strong>Mulai:</strong> <span id="eventStart"></span></p>
+                        <p><strong>Selesai:</strong> <span id="eventEnd"></span></p>
+                        <div>
+                            <strong>Barang:</strong>
+                            <ul id="daftar-barang" style="margin-top: 5px; padding-left: 20px;">
+                            </ul>
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
-                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
                 </div>
             </div>
         </div>
+    </div>
 @endsection
 
 @push('js')
@@ -228,7 +251,7 @@
                     if (event.extendedProps.detail) {
                         const details = event.extendedProps.detail;
                         const listContainer = document.getElementById(
-                        'daftar-barang'); // Target elemen <ul>
+                            'daftar-barang'); // Target elemen <ul>
 
                         // Kosongkan daftar sebelumnya untuk menghindari duplikasi
                         listContainer.innerHTML = '';
@@ -277,7 +300,7 @@
     </script>
     <script>
         $(document).ready(function() {
-            $('#ruangan_id').select2({
+            $('#unitkerja_id').select2({
 
             });
         });

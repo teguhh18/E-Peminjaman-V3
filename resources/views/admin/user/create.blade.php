@@ -81,6 +81,7 @@
                                     <option value="{{ old('level') }}">-Level User-</option>
                                     <option value="admin">Admin</option>
                                     <option value="baak">Baak</option>
+                                    <option value="kerumahtanggaan">Kerumahtanggaan</option>
                                     <option value="mahasiswa">Mahasiswa</option>
                                 </select>
                                 @error('level')

@@ -130,8 +130,13 @@
 
                         {{-- BAGIAN 4: ALUR PERSETUJUAN --}}
                         <h4 class="mb-3">4. Alur Persetujuan</h4>
-                        <p class="text-muted">Daftar approver akan ditentukan secara otomatis oleh sistem berdasarkan aset
-                            yang Anda pinjam.</p>
+                        <button type="button" class="btn btn-primary btn-sm mt-1 mb-1" data-bs-toggle="modal"
+                            data-bs-target="#modalTambahBarang" id="btnPilihApprover">
+                            Pilih Approver
+                        </button>
+                        <small class="text-muted">Daftar approver akan ditentukan secara otomatis oleh sistem berdasarkan
+                            aset
+                            yang Anda pinjam.</small>
                         <div class="table-responsive">
                             <table class="table table-bordered" id="approver">
                                 <thead>
@@ -165,101 +170,75 @@
 @endsection
 @push('js')
     <script>
-        // Mengatur batasan input date minimal 3 hari kedepan
-        document.addEventListener('DOMContentLoaded', function() {
-            // 1. Ambil elemen input date
-            const waktuPinjamInput = document.getElementById('waktu_peminjaman');
-            const waktuSelesaiInput = document.getElementById('waktu_pengembalian');
-
-            // --- Minimal hari ini, disable input dimasa lalu---
-            const minDate = new Date();
-
-            const year = minDate.getFullYear();
-            const month = String(minDate.getMonth() + 1).padStart(2, '0');
-            const day = String(minDate.getDate()).padStart(2, '0');
-            const minDateTimeString = `${year}-${month}-${day}T00:00`;
-
-            // Atur 'min' untuk KEDUA input saat halaman pertama kali dimuat
-            waktuPinjamInput.min = minDateTimeString;
-            waktuSelesaiInput.min = minDateTimeString;
-        });
-    </script>
-    <script>
         $(document).ready(function() {
             // ===================================================================
             // 1. STATE & INISIALISASI AWAL
             // ===================================================================
 
+            // Variabel untuk menyimpan state
             let daftarBarang = @json($barangPeminjaman ?? []);
-            // let dataApprover = @json($approvers ?? []);
-            let listApprover = (@json($approvers ?? [])).map(approver => {
-                approver.is_manual = true; // Tandai semua approver awal sebagai "manual"
-                return approver;
-            });
-            updateTabelBarang();
-            // Fungsi untuk merender tabel barang dan approver dengan data awal
-            getAndUpdateApprovers();
+            let listApprover = (@json($approvers ?? [])).map(approver => ({
+                ...approver,
+                is_manual: true
+            }));
+            let manuallyRemovedApprovers = [];
 
+            // Setup CSRF token untuk semua request AJAX
             $.ajaxSetup({
                 headers: {
                     'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
                 }
             });
 
-            // Inisialisasi Select2 untuk elemen yang sudah ada di halaman
-            $('#ruangan_id, #nama_id').select2({
-                placeholder: 'Pilih',
+            // Inisialisasi Select2
+            $('#nama_id').select2({
+                placeholder: 'Pilih Opsi',
+                theme: 'bootstrap-5',
+                allowClear: true,
+                width: '100%'
+            });
+            $('#ruangan_id').select2({
+                placeholder: 'Pilih Opsi',
                 // theme: 'bootstrap-5',
                 allowClear: true,
                 width: '100%'
             });
 
-            // Untuk isi input Prodi, NPM/Username, dan NO Telepon Secara Otomatis setelah pilih nama
-            // 1. Buat fungsi yang bisa digunakan kembali untuk mengambil dan mengisi data user
-            function fetchAndFillUserData(userId) {
-                // Jika tidak ada ID yang dipilih (misal memilih "-Pilih Peminjam-"), kosongkan input
-                if (!userId) {
-                    $('#user_id').val('');
-                    $('#prodi').val('');
-                    $('#username').val('');
-                    $('#no_telepon').val('');
-                    return; // Hentikan eksekusi
-                }
-                // Lakukan panggilan AJAX untuk mendapatkan detail user
-                $.get("{{ route('get.user') }}", {
-                    user_id: userId,
-                }, function(res) {
-                    const namaProdi = res.mahasiswa ? res.mahasiswa.nama_program_studi : '';
+            // Mengatur batasan input date
+            const minDate = new Date();
+            const year = minDate.getFullYear();
+            const month = String(minDate.getMonth() + 1).padStart(2, '0');
+            const day = String(minDate.getDate()).padStart(2, '0');
+            const minDateTimeString = `${year}-${month}-${day}T00:00`;
+            $('#waktu_peminjaman, #waktu_pengembalian').attr('min', minDateTimeString);
 
-                    // Gunakan .val() untuk mengisi nilai input form
-                    $('#user_id').val(res.id);
-                    $('#prodi').val(namaProdi);
-                    $('#username').val(res.username);
-                    $('#no_telepon').val(res.no_telepon);
-                }).fail(function() {
-                    const message = "Gagal memuat data detail pengguna.";
-                    // Ganti dengan notifikasi pilihan Anda, misalnya sweetAlert(message);
-                    alert(message);
-                });
-            }
-            // Pasang event listener 'change' yang akan memanggil fungsi fetchAndFillUserData
-            $('#nama_id').on('change', function() {
-                const selectedUserId = $(this).val();
-                fetchAndFillUserData(selectedUserId);
-            });
-            // 3. Picu fungsi saat halaman pertama kali dimuat
+            // Memuat data awal saat halaman dibuka
+            updateTabelBarang();
+            getAndUpdateApprovers();
             const initialUserId = $('#nama_id').val();
             if (initialUserId) {
                 fetchAndFillUserData(initialUserId);
             }
 
+            // ===================================================================
             // 2. EVENT HANDLERS (PENANGAN AKSI PENGGUNA)
-            // Perbarui daftar approver saat ada perubahan ruangan
-            $('#ruangan_id').on('change', getAndUpdateApprovers);
+            // ===================================================================
 
-            // -- Manajemen Barang --
+            // Update data user saat peminjam dipilih
+            $('#nama_id').on('change', function() {
+                fetchAndFillUserData($(this).val());
+            });
+
+            // Update approver saat ruangan atau waktu berubah
+            $('#ruangan_id, #waktu_peminjaman, #waktu_pengembalian').on('change', getAndUpdateApprovers);
+
+            // Buka modal untuk tambah barang
             $(document).on("click", "#btnTambahBarang", handleModalBarang);
+
+            // Proses penambahan barang dari modal
             $(document).on('submit', '#form-tambah-barang', handleTambahBarang);
+
+            // Hapus barang dari daftar
             $(document).on('click', '.btn-hapus-barang', function() {
                 const barangId = $(this).data('id');
                 daftarBarang = daftarBarang.filter(item => item.id != barangId);
@@ -267,275 +246,244 @@
                 getAndUpdateApprovers();
             });
 
-            // -- Manajemen Approver --
+            // Buka modal untuk pilih approver
             $(document).on("click", "#btnPilihApprover", handleModalApprover);
+
+            // Proses penambahan approver dari modal
             $(document).on('click', '#btn-submit-approver', handleTambahApprover);
+
+            // Hapus approver dari daftar
             $(document).on('click', '.btn-hapus-approver', function() {
                 const approverId = parseInt($(this).data('id'));
+
+                if (!manuallyRemovedApprovers.includes(approverId)) {
+                    manuallyRemovedApprovers.push(approverId);
+                }
                 listApprover = listApprover.filter(item => parseInt(item.id) !== approverId);
-                getAndUpdateApprovers();
+                renderTabelApprover();
             });
 
             // ===================================================================
             // 3. FUNGSI-FUNGSI BANTUAN (HELPER FUNCTIONS)
             // ===================================================================
 
-            // --- Fungsi untuk Barang ---
-            function handleModalBarang() {
-                $.ajax({
-                        url: "{{ route('mahasiswa.peminjaman.modal-barang') }}",
-                        method: 'GET',
+            /** Menampilkan notifikasi error menggunakan SweetAlert */
+            function sweetAlert(message) {
+                Swal.fire({
+                    title: "Info!",
+                    text: message,
+                    icon: "error"
+                });
+            }
+
+            // --- Fungsi untuk Data Pengguna ---
+
+            /** Mengambil dan mengisi data detail pengguna (Prodi, NPM, dll) */
+            function fetchAndFillUserData(userId) {
+                const fields = ['#user_id', '#prodi', '#username', '#no_telepon'];
+                if (!userId) {
+                    fields.forEach(field => $(field).val(''));
+                    return;
+                }
+                $.get("{{ route('get.user') }}", {
+                        user_id: userId
                     })
+                    .done(function(res) {
+                        const namaProdi = res.mahasiswa ? res.mahasiswa.nama_program_studi : '';
+                        $('#user_id').val(res.id);
+                        $('#prodi').val(namaProdi);
+                        $('#username').val(res.username);
+                        $('#no_telepon').val(res.no_telepon);
+                    })
+                    .fail(() => sweetAlert("Gagal memuat data detail pengguna."));
+            }
+
+            // --- Fungsi untuk Manajemen Barang ---
+
+            /** Menampilkan modal untuk menambah barang */
+            function handleModalBarang() {
+                $.get("{{ route('mahasiswa.peminjaman.modal-barang') }}")
                     .done(function(data) {
                         $('#modalContainer').html(data.html);
-                        const modalEl = document.getElementById('modalTambahBarang');
-                        // Buat instance baru setiap kali, dan biarkan Bootstrap menanganinya.
-                        const myModal = new bootstrap.Modal(modalEl);
-                        myModal.show();
+                        const modalEl = $('#modalTambahBarang');
+                        modalEl.modal('show');
 
-                        // Dengarkan event 'hidden.bs.modal' untuk membersihkan DOM setelah modal tertutup
-                        modalEl.addEventListener('hidden.bs.modal', event => {
-                            // Hapus elemen modal dari DOM untuk mencegah duplikasi
-                            $(modalEl).remove();
-                        });
-
-                        // Select2 untuk pilih barang di modal
                         $('#barang_id').select2({
                             placeholder: 'Pilih Barang',
                             allowClear: true,
-                            dropdownParent: $('#modalTambahBarang'),
+                            dropdownParent: modalEl,
                             theme: 'bootstrap-5',
                             width: '100%',
+                        }).on('change', cekKetersediaanBarang);
+
+                        // Gunakan event handler jQuery yang konsisten untuk membersihkan modal
+                        modalEl.on('hidden.bs.modal', function() {
+                            $(this).remove();
                         });
-
-                        // // Atur max jumlah berdasarkan stok barang
-                        $('#barang_id').on('change', function() {
-                            const id = $(this).val();
-                            const mulai = $('#waktu_peminjaman').val();
-                            const sampai = $('#waktu_pengembalian').val();
-                            const jumlahInput = $('#jumlah'); // Simpan elemen input jumlah
-                            if (!id) return;
-
-                            $.get("{{ route('cek.ketersediaan.barang') }}", {
-                                barang_id: id,
-                                waktu_peminjaman: mulai,
-                                waktu_pengembalian: sampai
-                            }, function(res) {
-                                jumlahInput.prop('disabled', false);
-                                // Atur batas maksimal input jumlah sesuai stok tersedia
-                                if (res.stok_tersedia < 1) {
-                                    // Panggil SweetAlert
-                                    const message =
-                                        "Stok Tidak Tersedia/Habis Untuk Hari dan Jam yang Kamu Pilih";
-                                    sweetAlert(message);
-                                }
-                                jumlahInput.attr('max', res.stok_tersedia);
-
-                                // Beri placeholder sesuai stok yang tersedia
-                                jumlahInput.attr('placeholder',
-                                    `Maksimal ${res.stok_tersedia} unit`);
-
-
-                            }).fail(function() {
-                                jumlahInput.prop('disabled', false);
-                                // Panggil SweetAlert
-                                const message =
-                                    "Gagal mengecek ketersediaan barang, Pilih Hari dan Jam Terlebih Dahulu";
-                                sweetAlert(message);
-                            });
-                        });
-
-
-                    })
+                    });
             }
 
+            /** Memvalidasi dan menambah barang ke `daftarBarang` */
             function handleTambahBarang(e) {
                 e.preventDefault();
-                const barangId = $('#barang_id').val(); // value id barang dari barang yang dipilih
+                const barangId = $('#barang_id').val();
                 const barangText = $('#barang_id option:selected').text();
                 const jumlah = parseInt($('#jumlah').val());
 
-                // form modal tidak boleh ada yang kosong
                 if (!barangId || !jumlah || jumlah < 1) {
-                    // Panggil SweetAlert
-                    const message = "Barang dan jumlah wajib diisi!";
-                    sweetAlert(message);
+                    return sweetAlert("Barang dan jumlah wajib diisi!");
                 }
-
-                // Cek duplikat data/ apakah barang sudah ditambahkan
                 if (daftarBarang.some(item => item.id == barangId)) {
-                    // Panggil SweetAlert
-                    Swal.fire({
-                        title: "Info!",
-                        text: "Barang sudah ditambahkan!",
-                        icon: "error"
-                    });
-                    return;
+                    return sweetAlert("Barang sudah ditambahkan!");
                 }
 
-                // Tambahkan ke array & tampilkan ke tabel
                 daftarBarang.push({
                     id: barangId,
                     nama: barangText,
-                    jumlah: jumlah
+                    jumlah: jumlah,
+                    barang_id: barangId,
+                    jumlah_barang: jumlah
                 });
-
-                updateTabelBarang(); // panggi fungsi updateTabelBarang
-                getAndUpdateApprovers(); // panggi fungsi updateTabelApprover
-
-                // Reset/kosongkan input modal
-                $('#barang_id').val('').trigger('change');
-                $('#jumlah').val('');
-
-                // tutup modal
-                const modalEl = document.getElementById('modalTambahBarang');
-                const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                // Cukup panggil hide(), biarkan Bootstrap mengurus backdrop
-                if (modalInstance) {
-                    modalInstance.hide();
-                }
+                updateTabelBarang();
+                getAndUpdateApprovers();
+                // Tutup modal
+                $('#modalTambahBarang').modal('hide');
             }
 
+            /** Merender ulang tabel daftar barang */
             function updateTabelBarang() {
                 let html = '';
                 daftarBarang.forEach((item, index) => {
                     html += `
                 <tr>
                     <td>${index + 1}</td>
-                    <td>${item.nama}<input type="hidden" id="barang_id[]" name="barang_id[]" value="${item.id}"></td>
-                    <td>${item.jumlah}<input type="hidden" name="jumlah_barang[]" value="${item.jumlah}"></td>
+                    <td>${item.nama}<input type="hidden" name="barang_id[]" value="${item.barang_id || item.id}"></td>
+                    <td>${item.jumlah}<input type="hidden" name="jumlah_barang[]" value="${item.jumlah_barang || item.jumlah}"></td>
                     <td><button type="button" class="btn btn-danger btn-sm btn-hapus-barang" data-id="${item.id}">Hapus</button></td>
                 </tr>`;
                 });
                 $('#daftarBarang').html(html);
             }
 
-            // --- Fungsi untuk Approver ---
+            /** Mengecek ketersediaan stok barang pada tanggal yang dipilih */
+            function cekKetersediaanBarang() {
+                const id = $('#barang_id').val();
+                const mulai = $('#waktu_peminjaman').val();
+                const sampai = $('#waktu_pengembalian').val();
+                const jumlahInput = $('#jumlah');
+
+                if (!id || !mulai || !sampai) {
+                    jumlahInput.prop('disabled', true).attr('placeholder', 'Pilih waktu & barang');
+                    if (id && (!mulai || !sampai)) sweetAlert("Pilih waktu peminjaman terlebih dahulu.");
+                    return;
+                }
+
+                $.get("{{ route('cek.ketersediaan.barang') }}", {
+                        barang_id: id,
+                        waktu_peminjaman: mulai,
+                        waktu_pengembalian: sampai
+                    })
+                    .done(function(res) {
+                        jumlahInput.prop('disabled', false).attr('max', res.stok_tersedia);
+                        jumlahInput.attr('placeholder', `Maks. ${res.stok_tersedia} unit`);
+                        if (res.stok_tersedia < 1) {
+                            sweetAlert("Stok tidak tersedia pada waktu yang dipilih.");
+                            jumlahInput.prop('disabled', true);
+                        }
+                    })
+                    .fail(() => sweetAlert("Gagal mengecek ketersediaan barang."));
+            }
+
+            // --- Fungsi untuk Manajemen Approver ---
+
+            /** Menampilkan modal untuk memilih approver secara manual */
             function handleModalApprover() {
                 $.get("{{ route('admin.peminjaman.modal-approver') }}")
                     .done(function(data) {
                         $('#modalContainer').html(data.html);
-                        $('#modalPilihApprover').modal('show');
+                        const modalEl = $('#modalPilihApprover');
+                        modalEl.modal('show');
                         $('#approver_id').select2({
-                            dropdownParent: $('#modalPilihApprover'),
-                            theme: 'bootstrap-5'
+                            placeholder: 'Pilih Approver',
+                            dropdownParent: modalEl,
+                            theme: 'bootstrap-5',
+                            width: '100%',
                         });
+                        modalEl.on('hidden.bs.modal', () => $(this).remove());
                     });
             }
 
-            let manuallyRemovedApprovers = [];
-            // fungsi hapus approver
-            window.hapusApprover = function(id) {
-                const approverId = parseInt(id);
-                // Catat ID yang dihapus ke "daftar hitam" agar tidak disarankan lagi
-                if (!manuallyRemovedApprovers.includes(approverId)) {
-                    manuallyRemovedApprovers.push(approverId);
-                }
-                // Hapus dari daftar utama
-                listApprover = listApprover.filter(item => parseInt(item.id) !== approverId);
-                renderTabelApprover();
-            }
-
+            /** Menambah approver yang dipilih manual ke `listApprover` */
             function handleTambahApprover(e) {
                 e.preventDefault();
-                const approverId = $('#approver_id').val(); // value id approver yang dipilih
+                const approverId = $('#approver_id').val();
                 const approverName = $('#approver_id option:selected').text();
 
-                // form modal tidak boleh ada yang kosong
                 if (!approverId) {
-                    // Panggil SweetAlert
-                    const message = "Pilih Approver Terlebih Dahulu";
-                    sweetAlert(message);
+                    return sweetAlert("Pilih approver terlebih dahulu.");
                 }
-
-                // Cek duplikat data/apakah approver sudah ditambahkan
                 if (listApprover.some(item => item.id == approverId)) {
-                    // Panggil SweetAlert
-                    Swal.fire({
-                        title: "Info!",
-                        text: "Approver yang dipilih sudah ditambahkan!",
-                        icon: "error"
-                    });
-                    return;
+                    return sweetAlert("Approver yang dipilih sudah ditambahkan!");
                 }
 
-                // Tambahkan ke daftar dan beri penanda sebagai pilihan MANUAL
                 listApprover.push({
                     id: approverId,
                     nama: approverName,
                     is_manual: true
                 });
                 renderTabelApprover();
-                // Reset/kosongkan input modal
-                $('#approver_id').val('').trigger('change');
-
-                // tutup modal
-                const modalEl = document.getElementById('modalPilihApprover');
-                const modalInstance = bootstrap.Modal.getInstance(modalEl);
-                // Cukup panggil hide(), biarkan Bootstrap mengurus backdrop
-                if (modalInstance) {
-                    modalInstance.hide();
-                }
+                $('#modalPilihApprover').modal('hide');
             }
 
+            /** Mengambil saran approver dari server dan memperbarui daftar */
             function getAndUpdateApprovers() {
                 const ruanganId = $('#ruangan_id').val();
                 const barangIds = daftarBarang.map(item => item.id);
+                const mulai = $('#waktu_peminjaman').val();
+                const sampai = $('#waktu_pengembalian').val();
 
-                // Ambil saran approver dari server
+                if (!ruanganId && barangIds.length === 0) {
+                    listApprover = listApprover.filter(approver => approver.is_manual === true);
+                    renderTabelApprover();
+                    return;
+                }
+
                 $.get("{{ route('mahasiswa.peminjaman.list-approver') }}", {
                     ruangan_id: ruanganId,
                     barang_id: barangIds,
+                    waktu_peminjaman: mulai,
+                    waktu_pengembalian: sampai
                 }).done(function(res) {
                     const suggestions = res.approvers;
-                    console.log(suggestions)
-                    // 1. Hapus saran sistem yang lama, TAPI pertahankan yang ditambah manual
                     listApprover = listApprover.filter(approver => approver.is_manual === true);
 
-                    // 2. Gabungkan dengan saran baru dari server, hindari duplikasi & yang sudah dihapus manual
                     suggestions.forEach(suggestion => {
-                        const isAlreadyInList = listApprover.some(item => item.id == suggestion.id);
-                        const wasManuallyRemoved = manuallyRemovedApprovers.includes(parseInt(
-                            suggestion.id));
-
-                        if (!isAlreadyInList && !wasManuallyRemoved) {
-                            suggestion.is_manual = false; // Tandai sebagai saran sistem
-                            listApprover.push(suggestion);
+                        const isInList = listApprover.some(item => item.id == suggestion.id);
+                        const wasRemoved = manuallyRemovedApprovers.includes(parseInt(suggestion
+                            .id));
+                        if (!isInList && !wasRemoved) {
+                            listApprover.push({
+                                ...suggestion,
+                                is_manual: false
+                            });
                         }
                     });
-
-                    // 3. Render ulang tabel dengan daftar yang sudah diperbarui
                     renderTabelApprover();
                 });
             }
 
+            /** Merender ulang tabel daftar approver */
             function renderTabelApprover() {
                 let html = '';
                 listApprover.forEach((item, index) => {
                     html += `
-                        <tr>
-                            <td>${index + 1}</td>
-                            <td>
-                                ${item.nama}
-                                <input type="hidden" name="approver_id[]" value="${item.id}">
-                            </td>
-                            <td>
-                                <button type="button" class="btn btn-danger btn-sm" onclick="hapusApprover(${item.id})">Hapus</button>
-                            </td>
-                        </tr>`;
+                <tr>
+                    <td>${index + 1}</td>
+                    <td>${item.nama}<input type="hidden" name="approver_id[]" value="${item.id}"></td>
+                    <td><button type="button" class="btn btn-danger btn-sm btn-hapus-approver" data-id="${item.id}">Hapus</button></td>
+                </tr>`;
                 });
                 $('#list-approver').html(html);
-            }
-
-
-            // Fungsi untuk SweetAlert
-            function sweetAlert(message) {
-                const alert = Swal.fire({
-                    title: "Info!",
-                    text: message,
-                    icon: "error"
-                });
-                return alert
             }
         });
     </script>

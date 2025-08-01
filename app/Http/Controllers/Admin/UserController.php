@@ -72,7 +72,7 @@ class UserController extends Controller
             $request->file('foto')->storeAs('public/users', $validatedData['foto']);
         }
 
-        $validatedData['foto'] = $validatedData['username'] . "-" . date('His') . "." . $request->file('foto')->getClientOriginalExtension();
+        // $validatedData['foto'] = $validatedData['username'] . "-" . date('His') . "." . $request->file('foto')->getClientOriginalExtension();
         // dd($validatedData['foto']);
 
         $validatedData['password'] = Hash::make($validatedData['password']);

@@ -138,15 +138,13 @@
                                 <input type="file" id="success-input-4"
                                     class="form-control @error('foto') has-error @enderror" name="foto"
                                     accept="image/*" onchange="previewImage()">
-
                                 @error('foto')
                                     <small class="invalid-feedback">
                                         {{ $message }}
                                     </small>
                                 @enderror
-                                <img src="{{ asset('storage/users/' . $dataUser->foto) }}" class="img-fluid mb-3"
+                                <img src="{{$dataUser->foto ? asset('storage/users/' . $dataUser->foto) : '' }}" class="img-fluid mb-3"
                                     width="250px">
-                                <br> Foto baru :
                                 <img class="img-preview img-fluid mb-3" width="250px">
                             </div>
                         </div>
