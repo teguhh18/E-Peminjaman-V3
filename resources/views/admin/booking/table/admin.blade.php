@@ -19,7 +19,7 @@
                     <td>
                         {{-- Tombol Whatsapp --}}
                         <a
-                            href="https://api.whatsapp.com/send?phone={{ $booking->no_peminjam }}&text=Pesan"
+                            href="https://api.whatsapp.com/send?phone={{ $booking->user->no_telepon }}&text=Halo {{ $booking->user->name }},%0A%0ASaya ingin mengonfirmasi peminjaman Anda untuk kegiatan *{{ $booking->kegiatan }}* pada tanggal {{ \Carbon\Carbon::parse($booking->waktu_peminjaman)->isoFormat('D MMM Y, HH:mm') }} hingga {{ \Carbon\Carbon::parse($booking->waktu_pengembalian)->isoFormat('D MMM Y, HH:mm') }}.%0A%0A- Admin E-Peminjaman"
                             target="_blank" class="btn btn-sm btn-success">
                             <i class="fa fa-comment me-1"></i> WhatsApp
                         </a>

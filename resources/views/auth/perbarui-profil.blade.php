@@ -89,8 +89,8 @@
                     </div>
 
                     <div class="card-footer text-end">
-                        <a href="{{ route('home.index') }}" class="btn btn-sm">Kembali</a>
-                        <button type="submit" class="btn btn-sm btn-warning"><i class="fa fa-pencil me-1"></i> Update Profil</button>
+                        <a href="{{ route('home.index') }}" class="btn btn-sm"><i class="fa fa-arrow-left me-1"></i>Kembali</a>
+                        <button type="submit" class="btn btn-sm btn-warning"><i class="fa fa-edit me-1"></i> Update Profil</button>
                     </div>
                 </form>
             </div>

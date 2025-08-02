@@ -18,10 +18,9 @@
                     <td class="center">{{ $loop->iteration }}</td>
                     <td>
                         {{-- Tombol Whatsapp --}}
-                        <a style="margin-top: 5px;"
-                            href="https://api.whatsapp.com/send?phone={{ $booking->no_peminjam }}&text=Pesan"
+                        <a href="https://api.whatsapp.com/send?phone={{ $booking->user->no_telepon }}&text=Halo {{ $booking->user->name }},%0A%0ASaya ingin mengonfirmasi peminjaman Anda untuk kegiatan *{{ $booking->kegiatan }}* pada tanggal {{ \Carbon\Carbon::parse($booking->waktu_peminjaman)->isoFormat('D MMM Y, HH:mm') }} hingga {{ \Carbon\Carbon::parse($booking->waktu_pengembalian)->isoFormat('D MMM Y, HH:mm') }}.%0A%0A- Tata Usaha {{ auth()->user()->unitkerja->kode }} ({{ auth()->user()->name }})"
                             target="_blank" class="btn btn-sm btn-success">
-                            <i class="fa fa-comment"></i> &nbsp; WhatsApp
+                            <i class="fa fa-comment me-1"></i> WhatsApp
                         </a>
 
                         <a style="margin-top: 5px;" href="{{ route('admin.peminjaman.edit', encrypt($booking->id)) }}"

@@ -113,12 +113,12 @@
                                     </div>
 
                                     {{-- Tombol Aksi --}}
-                                    <div class="mt-4 text-center">
+                                    {{-- <div class="mt-4 text-center">
                                         <a href="#" class="btn btn-red w-100 btn-detail"
                                             data-id="{{ $peminjaman->id }}">
                                             <i class="fa fa-eye me-1"></i>Detail
                                         </a>
-                                    </div>
+                                    </div> --}}
                                 </div>
                             </div>
                         </div>

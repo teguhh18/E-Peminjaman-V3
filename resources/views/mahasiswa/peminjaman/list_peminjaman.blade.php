@@ -52,7 +52,7 @@
                         @if (!$peminjaman->detail_peminjaman->isEmpty())
                             <div class="{{ $peminjaman->ruangan ? 'mt-2' : '' }}">
                                 <strong>Barang:</strong>
-                                <span class="btn btn-info btn-sm btn-detail" data-id="{{ $peminjaman->id }}">
+                                <span class="btn badge bg-azure text-white btn-detail" data-id="{{ $peminjaman->id }}">
                                     <i class="fa fa-eye me-1"></i>Detail Barang
                                 </span>
                             </div>
@@ -99,34 +99,34 @@
                     <td>
                         @switch($peminjaman->status_peminjaman)
                             @case('menunggu')
-                                <small class="text-xs badge bg-yellow text-yellow-fg">
+                                <small class="text-xs badge bg-warning text-warning-fg">
                                     <i class="fa fa-spinner fa-spin"></i> menunggu
                                     konfirmasi
                                 </small>
                             @break
 
                             @case('disetujui')
-                                <small class="text-xs badge bg-azure text-azure-fg">
-                                    <i class="fa fa-info"></i> Disetujui
+                                <small class="text-xs badge bg-azure text-blue-fg">
+                                    <i class="fa fa-check"></i> Disetujui
                                 </small>
                             @break
 
                             @case('ditolak')
                                 <small class="text-xs badge bg-red text-red-fg">
-                                    <i class="fa fa-xmark "></i>
+                                    <i class="fa fa-times"></i>
                                     Ditolak
                                 </small>
                             @break
 
                             @case('aktif')
-                                <small class="text-xs badge bg-warning text-warning-fg">
-                                    <i class="fa fa-xmark "></i> Aktif/Sedang Dipinjam
+                                <small class="text-xs badge bg-orange text-orange-fg">
+                                    <i class="fa fa-clock"></i> Aktif/Sedang Dipinjam
                                 </small>
                             @break
 
                             @case('selesai')
                                 <small class="text-xs badge bg-green text-green-fg">
-                                    <i class="fa fa-check-double "></i> Selesai/Dikembalikan
+                                    <i class="fa fa-check-double"></i> Selesai/Dikembalikan
                                 </small>
                             @break
 

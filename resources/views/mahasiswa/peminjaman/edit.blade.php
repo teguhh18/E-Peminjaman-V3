@@ -12,8 +12,11 @@
                 @endif
             </div>
 
-            <form action="{{ route('mahasiswa.peminjaman.store') }}" method="post" id="form-peminjaman">
+            <form action="{{ route('mahasiswa.peminjaman.update', encrypt($peminjaman->id)) }}" method="post" id="form-peminjaman">
                 @csrf
+                @method('put')
+
+                {{-- Header Kartu --}}
                 <div class="card">
                     {{-- HEADER KARTU DENGAN WARNA MERAH --}}
                     <div class="card-header bg-red text-white">
