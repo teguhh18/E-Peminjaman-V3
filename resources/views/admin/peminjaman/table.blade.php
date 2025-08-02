@@ -18,7 +18,7 @@
                     <td class="center">{{ $loop->iteration }}</td>
 
                     <td class="center">
-                        <div><b>Peminjam :</b> {{ $riwayat->user->name }}</div>
+                        <div><b>Peminjam :</b> {{ Str::title($riwayat->user->name) }}</div>
                         <div><b> Kegiatan :</b> {{ $riwayat->kegiatan }}</div>
                     </td>
 
@@ -53,7 +53,7 @@
                         {{-- Tampilkan Tombol Detail Barang jika ada barang yang dipinjam --}}
                         @if (!$riwayat->detail_peminjaman->isEmpty())
                             <div class="{{ $riwayat->ruangan ? 'mt-2' : '' }}">
-                                <strong>Barang:</strong>
+                                <strong>Barang:</strong><br>
                                 <button class="btn btn-sm btn-info btn-detail rounded" data-id="{{ $riwayat->id }}">
                                     <i class="fa fa-eye me-1"></i>Detail Barang
                                 </button>

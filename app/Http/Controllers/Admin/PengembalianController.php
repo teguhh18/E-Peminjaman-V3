@@ -64,7 +64,7 @@ class PengembalianController extends Controller
         // Update status ruangan
         $peminjaman->update([
             'status_ruangan' => $request->status,
-            // 'catatan' => $request->catatan,
+            'catatan' => $request->catatan,
         ]);
 
         // --- Logika kondisional berdasarkan status baru ---
@@ -118,7 +118,7 @@ class PengembalianController extends Controller
         // Update status barang
         $detailBarang->update([
             'status' => $request->status,
-            // 'catatan' => $request->catatan,
+            'catatan' => $request->catatan,
         ]);
 
         // =======================================================

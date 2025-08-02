@@ -29,7 +29,7 @@
                         </a>
                     </td>
                     <td class="center">
-                        <div><b>Peminjam :</b> {{ $booking->user->name }}</div>
+                        <div><b>Peminjam :</b> {{ Str::title($booking->user->name) }}</div>
                         <div><b> Kegiatan :</b> {{ $booking->kegiatan }}</div>
                     </td>
 
@@ -71,7 +71,7 @@
                         {{-- Tampilkan Tombol Detail Barang jika ada barang yang dipinjam --}}
                         @if (!$booking->detail_peminjaman->isEmpty())
                             <div class="{{ $booking->ruangan ? 'mt-2' : '' }}">
-                                <strong>Barang:</strong>
+                                <strong>Barang:</strong><br>
                                 <button class="btn btn-sm btn-info btn-detail rounded" data-id="{{ $booking->id }}">
                                     <i class="fa fa-eye me-1"></i>Detail Barang
                                 </button>
@@ -116,8 +116,7 @@
                                     <i class="{{ $icon }}"></i> {!! $statusText !!}
                                 </span><br>
                             @else
-                                <span class="badge {{ $bg }} d-inline-block mb-1 text-light"
-                                    id="btn-konfirmasi" data-id="{{ $persetujuan->id }}">
+                                <span class="badge {{ $bg }} d-inline-block mb-1 text-light">
                                     <i class="{{ $icon }}"></i> {!! $statusText !!}
                                 </span><br>
                             @endif

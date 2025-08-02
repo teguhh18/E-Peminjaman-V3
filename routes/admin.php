@@ -61,7 +61,7 @@ Route::middleware(['auth_admin'])->group(function () {
 });
 
 // ROUTE ADMIN DAN BAAK BISA AKSES (auth_baak)
-Route::middleware(['auth_baak'])->group(function () {
+Route::middleware(['auth_baak','cek_profil'])->group(function () {
     // DASHBOARD
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     // DASHBOARD CARD PEMINJAMAN

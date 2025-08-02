@@ -18,8 +18,7 @@
                     <td class="center">{{ $loop->iteration }}</td>
                     <td>
                         {{-- Tombol Whatsapp --}}
-                        <a
-                            href="https://api.whatsapp.com/send?phone={{ $booking->user->no_telepon }}&text=Halo {{ $booking->user->name }},%0A%0ASaya ingin mengonfirmasi peminjaman Anda untuk kegiatan *{{ $booking->kegiatan }}* pada tanggal {{ \Carbon\Carbon::parse($booking->waktu_peminjaman)->isoFormat('D MMM Y, HH:mm') }} hingga {{ \Carbon\Carbon::parse($booking->waktu_pengembalian)->isoFormat('D MMM Y, HH:mm') }}.%0A%0A- Admin E-Peminjaman"
+                        <a href="https://api.whatsapp.com/send?phone={{ $booking->user->no_telepon }}&text=Halo {{ $booking->user->name }},%0A%0ASaya ingin mengonfirmasi peminjaman Anda untuk kegiatan *{{ $booking->kegiatan }}* pada tanggal {{ \Carbon\Carbon::parse($booking->waktu_peminjaman)->isoFormat('D MMM Y, HH:mm') }} hingga {{ \Carbon\Carbon::parse($booking->waktu_pengembalian)->isoFormat('D MMM Y, HH:mm') }}.%0A%0A- Admin E-Peminjaman"
                             target="_blank" class="btn btn-sm btn-success">
                             <i class="fa fa-comment me-1"></i> WhatsApp
                         </a>
@@ -29,13 +28,12 @@
                             <i class="fa fa-edit me-1"></i> Edit
                         </a>
 
-                        <span id="btn-delete" data-id="{{ $booking->id }}"
-                            class="btn btn-sm btn-danger mt-1">
+                        <span id="btn-delete" data-id="{{ $booking->id }}" class="btn btn-sm btn-danger mt-1">
                             <i class="fa fa-trash me-1"></i> Hapus
                         </span>
                     </td>
                     <td class="center">
-                        <div><b>Peminjam :</b> {{ $booking->user->name }}</div>
+                        <div><b>Peminjam :</b> {{ Str::title($booking->user->name) }}</div>
                         <div><b> Kegiatan :</b> {{ $booking->kegiatan }}</div>
                     </td>
 
@@ -59,7 +57,8 @@
                             </div>
                             {{-- Tampilkan status kunci jika relevan --}}
                             @if (in_array($booking->status_peminjaman, ['disetujui', 'aktif', 'selesai']))
-                                <span class="btn badge bg-blue-lt" id="btn-status-ruangan" data-id="{{ $booking->id }}">
+                                <span class="btn badge bg-blue-lt" id="btn-status-ruangan"
+                                    data-id="{{ $booking->id }}">
                                     Status :
                                     {{ Str::title(str_replace('_', ' ', $booking->status_ruangan ?? 'Disetujui')) }}
                                 </span>
@@ -69,7 +68,7 @@
                         {{-- Tampilkan Tombol Detail Barang jika ada barang yang dipinjam --}}
                         @if (!$booking->detail_peminjaman->isEmpty())
                             <div class="{{ $booking->ruangan ? 'mt-2' : '' }}">
-                                <strong>Barang:</strong>
+                                <strong>Barang:</strong> <br>
                                 <button class="btn btn-sm btn-info btn-detail rounded" data-id="{{ $booking->id }}">
                                     <i class="fa fa-eye me-1"></i>Detail Barang
                                 </button>
@@ -89,7 +88,7 @@
                                 $user = $persetujuan->user?->name;
                                 $status = $persetujuan->status;
                                 $statusText = '';
-                                    $statusText = "<b>Tata Usaha $unit</b> $status" . ($user ? " oleh $user" : '');
+                                $statusText = "<b>Tata Usaha $unit</b> $status" . ($user ? " oleh $user" : '');
 
                                 // Tampilan warna approve berdasarkan statusnya
                                 switch ($persetujuan->status) {
