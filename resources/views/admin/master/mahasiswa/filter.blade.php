@@ -29,7 +29,7 @@
         </div>
         <div class="col-md-6 mb-2">
             <div class="form-group">
-                <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter"></i>
+                <button type="submit" class="btn btn-primary btn-sm"><i class="fa fa-filter me-1"></i>
                     Filter</button>
             </div>
         </div>

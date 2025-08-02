@@ -17,7 +17,7 @@
 
                         <a href="{{ route('mahasiswa.peminjaman.create') }}" class="btn btn-sm btn-red">
                             <i class="fa fa-plus me-1"></i>
-                            Buat Peminjaman Baru </a>
+                            Buat Baru </a>
                     </div>
                 </div>
                 <div class="card-body">

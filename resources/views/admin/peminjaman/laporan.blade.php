@@ -41,23 +41,25 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <table class="table table-striped table-bordered " id="datatables">
-                        <thead style="text-align: center !important">
-                            <tr>
-                                <th width="5%">No</th>
-                                <th>Nama Peminjam</th>
-                                <th>No Hp</th>
-                                <th>Ruangan</th>
-                                <th>Kegiatan</th>
-                                <th>Waktu</th>
-                                <th>Status</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="odd gradeX ">
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered " id="datatables">
+                            <thead style="text-align: center !important">
+                                <tr>
+                                    <th width="5%">No</th>
+                                    <th>Nama Peminjam</th>
+                                    <th>No Hp</th>
+                                    <th>Ruangan</th>
+                                    <th>Kegiatan</th>
+                                    <th>Waktu</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="odd gradeX ">
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
                     {{-- <button type="" class="btn btn-primary">Cetak Laporan</button> --}}
                     <button type="button" class="btn btn-primary btn-sm" id="cetakLaporanBtn" onclick="cetakLaporan()"><i class="fa fa-print me-1"></i>Cetak

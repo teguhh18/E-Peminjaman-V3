@@ -144,7 +144,7 @@
                             Kembali
                         </a>
                         <button type="submit" class="btn btn-red btn-sm">
-                            <i class="fa fa-floppy-o me-1"></i>Simpan
+                            <i class="fa fa-save me-1"></i>Simpan
                         </button>
                     </div>
                 </div>

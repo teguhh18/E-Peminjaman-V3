@@ -44,11 +44,11 @@
                     <div class="card-actions d-flex gap-2">
                         <a href="{{ route('mahasiswa.peminjaman.create') }}" class="btn btn-red btn-sm">
                             <i class="fa fa-plus me-1"></i>
-                            Buat Peminjaman
+                            Buat
                         </a>
                         <a href="{{ route('mahasiswa.peminjaman.index') }}" class="btn btn-secondary btn-sm">
                             <i class="fa fa-history me-1"></i>
-                            Riwayat Peminjaman
+                            Riwayat
                         </a>
                     </div>
                 </div>
